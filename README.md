@@ -1,4 +1,4 @@
-# Lab 2 - Geometric Transformations
+# comp371-project
 
 ## Build Instructions
 
