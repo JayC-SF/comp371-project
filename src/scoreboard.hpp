@@ -1,11 +1,13 @@
 class Scoreboard
 {
 public:
-    const int MAXSCORE = 9;
+    const int MAXSCORE = 40;
     int player1Score = 0, player2Score = 0;
+    int minutes = 0, seconds = 0;
     glm::vec3 player1Color = glm::vec3(0.0f, 0.0f, 1.0f);
     glm::vec3 player2Color = glm::vec3(1.0f, 0.0f, 0.0f);
     glm::vec3 scoreboardColor = glm::vec3(0.0f, 0.0f, 0.0f);
+    glm::vec3 timeColor = glm::vec3(235 / 255.0f, 192 / 255.0f, 52 / 255.0f);
 
     // Draw the scoreboard at a certain position and angle
     void drawScoreboard(int cubeVAO, int shaderProgram)
@@ -15,7 +17,7 @@ public:
 
         // part matrix for the scoreboard
         glm::mat4 partMatrix = glm::mat4(1.0f);
-        partMatrix = glm::scale(partMatrix, glm::vec3(0.25f, 5.0f, 10.0f));
+        partMatrix = glm::scale(partMatrix, glm::vec3(0.25f, 5.0f, 15.0f));
 
         // model matrix for scoreboard and numbers
         glm::mat4 modelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 2.5f, 0.0f));
@@ -23,6 +25,12 @@ public:
 
         // Draw scoreboard
         glBindVertexArray(cubeVAO);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+
+        // scoreboard behind time
+        partMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 2.5f, 0.0f));
+        partMatrix = glm::scale(partMatrix, glm::vec3(0.25f, 5.5f, 7.0f));
+        glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "modelMatrix"), 1, GL_FALSE, &(modelMatrix * partMatrix)[0][0]);
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
         // check if score is above the max allowed score
@@ -35,14 +43,31 @@ public:
         }
 
         // Draw player 1 score
+        // Ones
         glUniform3fv(glGetUniformLocation(shaderProgram, "myColor"), 1, &player1Color[0]); // set color
-        glm::mat4 translate = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 2.5f));
-        drawNumber(shaderProgram, player1Score, modelMatrix * translate);
+        glm::mat4 transform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 2.5f));
+        drawNumber(shaderProgram, player1Score % 10, modelMatrix * transform);
+
+        // Tens
+        transform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 6.0f));
+        drawNumber(shaderProgram, player1Score / 10, modelMatrix * transform);
 
         // Draw player 2 score
+        // Ones
         glUniform3fv(glGetUniformLocation(shaderProgram, "myColor"), 1, &player2Color[0]); // set color
-        translate = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -2.5f));
-        drawNumber(shaderProgram, player2Score, modelMatrix * translate);
+        transform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -6.0f));
+        drawNumber(shaderProgram, player2Score % 10, modelMatrix * transform);
+
+        // Tens
+        transform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -2.5f));
+        drawNumber(shaderProgram, player2Score / 10, modelMatrix * transform);
+
+        // TODO render time above scoreboard
+        glUniform3fv(glGetUniformLocation(shaderProgram, "myColor"), 1, &timeColor[0]); // set color
+        transform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 4.0f, 0.0f));
+        transform = glm::scale(transform, glm::vec3(1.0f, 0.4f, 0.4f));
+        incrementTime(); // increment time before drawing it
+        drawTime(shaderProgram, modelMatrix * transform);
     }
 
     // numbers drawn using 7 segments like on a digital clock
@@ -116,6 +141,38 @@ public:
         }
     }
 
+    void drawTime(int shaderProgram, glm::mat4 modelMatrix)
+    {
+        // Minutes
+        // Ones
+        glm::mat4 transform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 2.5f));
+        drawNumber(shaderProgram, minutes % 10, modelMatrix * transform);
+
+        // Tens
+        transform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 6.0f));
+        drawNumber(shaderProgram, minutes / 10, modelMatrix * transform);
+
+        // Seconds
+        // Ones
+        transform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -6.0f));
+        drawNumber(shaderProgram, seconds % 10, modelMatrix * transform);
+
+        // Tens
+        transform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -2.5f));
+        drawNumber(shaderProgram, seconds / 10, modelMatrix * transform);
+
+        // colon
+        transform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        transform = glm::scale(transform, glm::vec3(0.3f, 0.3f, 0.3f));
+        glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "modelMatrix"), 1, GL_FALSE, &(modelMatrix * transform)[0][0]);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+
+        transform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -1.0f, 0.0f));
+        transform = glm::scale(transform, glm::vec3(0.3f, 0.3f, 0.3f));
+        glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "modelMatrix"), 1, GL_FALSE, &(modelMatrix * transform)[0][0]);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+    }
+
     int getPlayer1Score()
     {
         return player1Score;
@@ -134,5 +191,12 @@ public:
     void incrementPlayer2Score()
     {
         player2Score += 1;
+    }
+
+    void incrementTime()
+    {
+        int timeFromStart = (int)glfwGetTime();
+        seconds = timeFromStart % 60;
+        minutes = timeFromStart / 60;
     }
 };

@@ -1237,12 +1237,6 @@ int main(int argc, char *argv[])
         // Turn textures off before drawing scoreboard
         setUseTexture(shaderProgram, 0);
         scoreboard.drawScoreboard(baseCube_VAO, shaderProgram);
-        if (glfwGetTime() > 1.0f)
-        {
-            scoreboard.incrementPlayer1Score();
-            scoreboard.incrementPlayer2Score();
-            glfwSetTime(0.0f);
-        }
         setUseTexture(shaderProgram, useTexture);
 
         // End frame
