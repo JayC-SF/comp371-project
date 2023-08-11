@@ -6,7 +6,7 @@ public:
     int minutes = 0, seconds = 0;
     glm::vec3 player1Color = glm::vec3(0.0f, 0.0f, 1.0f);
     glm::vec3 player2Color = glm::vec3(1.0f, 0.0f, 0.0f);
-    glm::vec3 scoreboardColor = glm::vec3(0.0f, 0.0f, 0.0f);
+    glm::vec3 scoreboardColor = glm::vec3(30 / 255.0f, 86 / 255.0f, 90 / 255.0f);
     glm::vec3 timeColor = glm::vec3(235 / 255.0f, 192 / 255.0f, 52 / 255.0f);
 
     // Draw the scoreboard at a certain position and angle
@@ -16,21 +16,17 @@ public:
         glUniform3fv(glGetUniformLocation(shaderProgram, "myColor"), 1, &scoreboardColor[0]);
 
         // part matrix for the scoreboard
-        glm::mat4 partMatrix = glm::mat4(1.0f);
-        partMatrix = glm::scale(partMatrix, glm::vec3(0.25f, 5.0f, 15.0f));
+        glm::mat4 partMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 1.25f, 0.0f));
+        partMatrix = glm::scale(partMatrix, glm::vec3(0.25f, 8.0f, 15.0f));
 
         // model matrix for scoreboard and numbers
-        glm::mat4 modelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 2.5f, 0.0f));
+        glm::mat4 modelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 3.0f, 21.0f));
+        modelMatrix = glm::rotate(modelMatrix, glm::radians(10.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+        modelMatrix = glm::rotate(modelMatrix, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
         glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "modelMatrix"), 1, GL_FALSE, &(modelMatrix * partMatrix)[0][0]);
 
         // Draw scoreboard
         glBindVertexArray(cubeVAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-
-        // scoreboard behind time
-        partMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 2.5f, 0.0f));
-        partMatrix = glm::scale(partMatrix, glm::vec3(0.25f, 5.5f, 7.0f));
-        glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "modelMatrix"), 1, GL_FALSE, &(modelMatrix * partMatrix)[0][0]);
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
         // check if score is above the max allowed score
@@ -163,12 +159,12 @@ public:
 
         // colon
         transform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-        transform = glm::scale(transform, glm::vec3(0.3f, 0.3f, 0.3f));
+        transform = glm::scale(transform, glm::vec3(0.4f, 0.4f, 0.4f));
         glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "modelMatrix"), 1, GL_FALSE, &(modelMatrix * transform)[0][0]);
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
         transform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -1.0f, 0.0f));
-        transform = glm::scale(transform, glm::vec3(0.3f, 0.3f, 0.3f));
+        transform = glm::scale(transform, glm::vec3(0.4f, 0.4f, 0.4f));
         glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "modelMatrix"), 1, GL_FALSE, &(modelMatrix * transform)[0][0]);
         glDrawArrays(GL_TRIANGLES, 0, 36);
     }
@@ -198,5 +194,16 @@ public:
         int timeFromStart = (int)glfwGetTime();
         seconds = timeFromStart % 60;
         minutes = timeFromStart / 60;
+    }
+
+    // Resets all vars of the scoreboard
+    // Time is set to 0 as well
+    void reset()
+    {
+        player1Score = 0;
+        player2Score = 0;
+        seconds = 0;
+        minutes = 0;
+        glfwSetTime(0.0f);
     }
 };
