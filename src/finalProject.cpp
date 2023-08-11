@@ -1234,7 +1234,16 @@ int main(int argc, char *argv[])
         // render the whole scene (net, grid, axis, two rackets and letters, skybox)
         drawScene(shaderProgram, fullModelMatrices_SRT);
 
+        // Turn textures off before drawing scoreboard
+        setUseTexture(shaderProgram, 0);
         scoreboard.drawScoreboard(baseCube_VAO, shaderProgram);
+        if (glfwGetTime() > 1.0f)
+        {
+            scoreboard.incrementPlayer1Score();
+            scoreboard.incrementPlayer2Score();
+            glfwSetTime(0.0f);
+        }
+        setUseTexture(shaderProgram, useTexture);
 
         // End frame
         glfwSwapBuffers(window);
