@@ -8,6 +8,7 @@
 #include <random>
 #include <fstream> // std::ifstream
 #include <sstream> // std::stringstream, std::stringbuf
+#include "scoreboard.hpp"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
@@ -47,7 +48,6 @@ vec3 MY_UP(0.0f, 1.0f, 0.0f);
 vec3 MY_DOWN(0.0f, -1.0f, 0.0f);
 vec3 MY_FORWARD(0.0f, 0.0f, -1.0f);
 vec3 MY_BACKWARD(0.0f, 0.0f, 1.0f);
-
 
 GLuint loadTexture(const char *filename)
 {
@@ -275,15 +275,6 @@ int create_modelCube_VAO()
     glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
     glBufferData(GL_ARRAY_BUFFER, sizeof(texturedCubeVertexArray), texturedCubeVertexArray, GL_STATIC_DRAW);
 
-    int indicesLines[] = {
-
-    };
-    // Create an EBO for the LINE draw
-    GLuint EBO_LINES;
-    glGenBuffers(1, &EBO_LINES);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO_LINES);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indicesLines), indicesLines, GL_STATIC_DRAW);
-
     // Create poition pointer
     glVertexAttribPointer(0,                             // attribute 0 matches aPos in Vertex Shader
                           3,                             // size
@@ -365,7 +356,6 @@ int create_modelCube_VAO_skyBox()
 
     };
 
-    
     // Create a vertex array (VAO)
     GLuint vertexArrayObject;
     glGenVertexArrays(1, &vertexArrayObject);
@@ -511,7 +501,7 @@ void setSpotLight(int shaderProgram, vec3 position, float intensity, int current
 
 // ************************* GLOBALIZATION FOR THE DRAWSCENE FUNCTION PARAMETERS ***************************
 // load textures
-GLuint brickID,skyID,cementID,glossyID,woodID,fabricID,metalID,tennisID, ballID;
+GLuint brickID, skyID, cementID, glossyID, woodID, fabricID, metalID, tennisID, ballID;
 
 // *** Creating the VAOs ***
 // grid VAO
@@ -527,7 +517,7 @@ int skyBox_VAO_inside;
 // To create the rackets. These matrices set the inital position of the
 // Rackets
 mat4 translationMatrixArray[2] = {
-    translate(mat4(1.0f), vec3(-20.0f, 0.5, 8.0f)), // racket 1
+    translate(mat4(1.0f), vec3(-20.0f, 0.5, 8.0f)),  // racket 1
     translate(mat4(1.0f), vec3(20.0f, 0.5, -8.0f))}; // racket 2
 
 // Set the initial orientation of the rackets
@@ -539,12 +529,12 @@ mat4 fullModel_translationMatrix(1.0f);
 mat4 fullModel_rotationMatrix(1.0f);
 mat4 racketHandle_groupMatrix;
 
-// sphere VAO 
+// sphere VAO
 // source code obtained from here: https://github.com/carl-vbn/opengl-gravity-simulator/blob/main/src/rendering/baseModels/sphere.cpp
 struct TexturedVertex
 {
     TexturedVertex(glm::vec3 _position, glm::vec2 _uv)
-            : position(_position), uv(_uv) {}
+        : position(_position), uv(_uv) {}
 
     glm::vec3 position;
     glm::vec2 uv; // UV coordinates
@@ -614,7 +604,6 @@ GLuint createSphere(int resolution, float radius)
         vertexDataVector.push_back(vertex.uv.y);
     }
 
-
     // Create a vertex array object
     GLuint vertexArrayObject;
     glGenVertexArrays(1, &vertexArrayObject);
@@ -627,9 +616,9 @@ GLuint createSphere(int resolution, float radius)
     glBufferData(GL_ARRAY_BUFFER, vertexDataVector.size() * sizeof(GLfloat), &vertexDataVector[0], GL_STATIC_DRAW);
 
     // Set the vertex attribute pointers
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (void*)0); // Vertex position
-    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (void*)0); // Vertex position
-    glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat))); // UV coordinates
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (void *)0);                     // Vertex position
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (void *)0);                     // Vertex position
+    glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (void *)(3 * sizeof(GLfloat))); // UV coordinates
 
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(2);
@@ -690,21 +679,21 @@ void drawScene(int shaderProgram, mat4 fullModelMatrices_SRT[])
     // The Left Bracket
     mat4 leftBracket_scaleMatrix = scale(mat4(1.0f), vec3(0.1f, 1.7f, 0.1f));
     mat4 leftBracket_rotationMatrix = rotate(mat4(1.0f), radians(0.0f), vec3(1.0, 0.0, 0.0f));
-    mat4 leftBracket_translationMatrix = translate(mat4(1.0f), vec3(0.0f,2.2f,0.65f));
+    mat4 leftBracket_translationMatrix = translate(mat4(1.0f), vec3(0.0f, 2.2f, 0.65f));
 
     // The right Bracket
     mat4 rightBracket_scaleMatrix = scale(mat4(1.0f), vec3(0.1f, 1.7f, 0.1f));
     mat4 rightBracket_rotationMatrix = rotate(mat4(1.0f), radians(0.0f), vec3(1.0, 0.0, 0.0f));
-    mat4 rightBracket_translationMatrix = translate(mat4(1.0f), vec3(0.0f,2.2f,-0.65f));
+    mat4 rightBracket_translationMatrix = translate(mat4(1.0f), vec3(0.0f, 2.2f, -0.65f));
 
     // matrix that translates the initial cube upwards by 0.5
     mat4 initialCubeTranslate = translate(mat4(1.0f), vec3(0.0f, 0.5f, 0.0f));
     GLuint initialCubeTranslateLocation = glGetUniformLocation(shaderProgram, "modelMatrix");
     glUniformMatrix4fv(initialCubeTranslateLocation, 1, GL_FALSE, &initialCubeTranslate[0][0]);
 
-    //              ************************** START OF RENDERING **************************
-    //                             ************* RENDER THE COURSE NET *************
-    #pragma region
+//              ************************** START OF RENDERING **************************
+//                             ************* RENDER THE COURSE NET *************
+#pragma region
     setMaterial(shaderProgram, vec3(1.0), vec3(1.0), vec3(0.4, 0.4, 0.4), 1.f);
     glBindTexture(GL_TEXTURE_2D, brickID);
     // bind the standard cube with outward surfaces.
@@ -752,10 +741,10 @@ void drawScene(int shaderProgram, mat4 fullModelMatrices_SRT[])
     // left pole pole
     glUniformMatrix4fv(poles_modelMatrixLocation, 1, GL_FALSE, &(translate(mat4(1.0f), vec3(0.0f, 0.0f, -17.8f)) * poles_modelMatrix)[0][0]);
     glDrawArrays(GL_TRIANGLES, 0, 36);
-    #pragma endregion
+#pragma endregion
 
-    //                             ************* RENDER THE FLOOR *************
-    #pragma region
+//                             ************* RENDER THE FLOOR *************
+#pragma region
     glBindTexture(GL_TEXTURE_2D, tennisID);
     grid_modelMatrix = translate(mat4(1.0f), vec3(0.0f, -0.3f, 0.0f)) *
                        rotate(mat4(1.0f), radians(0.0f), vec3(0.0f, 1.0f, 0.0f)) *
@@ -780,12 +769,10 @@ void drawScene(int shaderProgram, mat4 fullModelMatrices_SRT[])
         glDrawArrays(GL_TRIANGLES, 0, 36);
     }
     glBindTexture(GL_TEXTURE_2D, brickID);
-    #pragma endregion
-
-
+#pragma endregion
 
     //                                     **************** RENDER THE TWO MODELS ****************
-    
+
     // a for loop to render the four rackets
 
     for (int i = 0; i < 2; i++)
@@ -799,38 +786,39 @@ void drawScene(int shaderProgram, mat4 fullModelMatrices_SRT[])
         // group matrix number 1
         mat4 shoulder_groupMatrix = fullModel_translationMatrix * fullModel_rotationMatrix * upperArm_translationMatrix * upperArm_rotationMatrix;
         // The upper arm model matrix
-        mat4 upperArm_modelMatrix = shoulder_groupMatrix * upperArm_scaleMatrix * translate(mat4(1.0f), vec3(0.0f, 0.5f, 0.0f));;
-        // update shader 
-        setModelMatrix(shaderProgram, upperArm_modelMatrix);                      
+        mat4 upperArm_modelMatrix = shoulder_groupMatrix * upperArm_scaleMatrix * translate(mat4(1.0f), vec3(0.0f, 0.5f, 0.0f));
+        ;
+        // update shader
+        setModelMatrix(shaderProgram, upperArm_modelMatrix);
         setColorUniform(shaderProgram, colorSkin);
         glDrawArrays(currentRenderMode, 0, 36);
 
-        //                                    **************** RENDER THE LOWER ARM ****************    
-        // Elbow group matrix that contains the shoulder group matrix
-        #pragma region 
+//                                    **************** RENDER THE LOWER ARM ****************
+// Elbow group matrix that contains the shoulder group matrix
+#pragma region
         // group matrix 2
-        mat4 elbow_groupMatrix = shoulder_groupMatrix  * lowerArm_translationMatrix * /* elbowFlexor_rotationMatrix  * */ lowerArm_rotationMatrix;
+        mat4 elbow_groupMatrix = shoulder_groupMatrix * lowerArm_translationMatrix * /* elbowFlexor_rotationMatrix  * */ lowerArm_rotationMatrix;
         // Lower arm model matrix
         mat4 lowerArm_modelMatrix = elbow_groupMatrix * lowerArm_scaleMatrix * translate(mat4(1.0f), vec3(0.0f, 0.5f, 0.0f));
         // update the shader
         setModelMatrix(shaderProgram, lowerArm_modelMatrix);
         glDrawArrays(currentRenderMode, 0, 36);
-        #pragma endregion
+#pragma endregion
 
-        //                                     **************** RENDER THE HAND ****************  
+        //                                     **************** RENDER THE HAND ****************
         // Model matrix of the racket handle
         glBindTexture(GL_TEXTURE_2D, fabricID);
-        #pragma region 
+#pragma region
         // group matrix 3
         mat4 hand_groupMatrix = elbow_groupMatrix * hand_translationMatrix * /* wrist_Flex_RotationMatrix * */ hand_rotationMatrix;
-                                        
-        mat4 hand_modelMatrix = hand_groupMatrix * hand_scaleMatrix *translate(mat4(1.0f), vec3(0.0f, 0.5f, 0.0f));
+
+        mat4 hand_modelMatrix = hand_groupMatrix * hand_scaleMatrix * translate(mat4(1.0f), vec3(0.0f, 0.5f, 0.0f));
         setColorUniform(shaderProgram, colorSkin);
 
         GLuint hand_modelMatrixLocation = glGetUniformLocation(shaderProgram, "modelMatrix");
         glUniformMatrix4fv(hand_modelMatrixLocation, 1, GL_FALSE, &hand_modelMatrix[0][0]);
         glDrawArrays(currentRenderMode, 0, 36);
-        #pragma endregion
+#pragma endregion
 
         // MODIFY THE LIGHT COMPONENTS TO REALLY METALIC LOOK.
         //                                 amb                            diff                             spec                                shine
@@ -913,7 +901,7 @@ void drawScene(int shaderProgram, mat4 fullModelMatrices_SRT[])
         {
             mat4 mesh_scaleMatrix = scale(mat4(1.0f), vec3(0.015f, 0.015f, 1.3f));
             mat4 mesh_rotationMatrix = rotate(mat4(1.0f), radians(0.0f), vec3(1.0f, 0.0f, 0.0f));
-            mat4 mesh_translationMatrix = translate(mat4(1.0f), vec3(0.0f, 2.2 + (i/5.0f), 0.0f));
+            mat4 mesh_translationMatrix = translate(mat4(1.0f), vec3(0.0f, 2.2 + (i / 5.0f), 0.0f));
             // Model matrix of the racket handle
             mat4 mesh_modelMatrix = racketHandle_groupMatrix *
                                     mesh_translationMatrix *
@@ -931,7 +919,7 @@ void drawScene(int shaderProgram, mat4 fullModelMatrices_SRT[])
         {
             mat4 mesh_scaleMatrix = scale(mat4(1.0f), vec3(0.015f, 0.015f, 1.7f));
             mat4 mesh_rotationMatrix = rotate(mat4(1.0f), radians(90.0f), vec3(1.0f, 0.0f, 0.0f));
-            mat4 mesh_translationMatrix = translate(mat4(1.0f), vec3(0.0f, 3.05f, -0.60f + (j/6.0f)));
+            mat4 mesh_translationMatrix = translate(mat4(1.0f), vec3(0.0f, 3.05f, -0.60f + (j / 6.0f)));
             // Model matrix of the racket handle
             mat4 mesh_modelMatrix = racketHandle_groupMatrix *
                                     mesh_translationMatrix *
@@ -945,7 +933,7 @@ void drawScene(int shaderProgram, mat4 fullModelMatrices_SRT[])
             glDrawArrays(currentRenderMode, 0, 36);
         }
     }
-        // ********************************** SHPERE *******************************************
+    // ********************************** SHPERE *******************************************
     mat4 sphere_scaleMatrix = scale(mat4(1.0f), vec3(1.0f, 1.0f, 1.0f));
     mat4 sphere_rotationMatrix = rotate(mat4(1.0f), radians(0.0f), vec3(0.0f, 1.0f, 0.0f));
     mat4 sphere_translationMatrix = translate(mat4(1.0f), vec3(17.0f, 5.0f, -10.5f));
@@ -959,8 +947,11 @@ void drawScene(int shaderProgram, mat4 fullModelMatrices_SRT[])
     glBindVertexArray(sphere);
     glBindTexture(GL_TEXTURE_2D, ballID);
     setColorUniform(shaderProgram, colorLightBlue);
-    glDrawElements(GL_TRIANGLES, vertexCount ,GL_UNSIGNED_INT,(void*)0);
+    glDrawElements(GL_TRIANGLES, vertexCount, GL_UNSIGNED_INT, (void *)0);
 }
+
+// Scoreboard object
+Scoreboard scoreboard = Scoreboard();
 
 int main(int argc, char *argv[])
 {
@@ -1068,8 +1059,8 @@ int main(int argc, char *argv[])
     GLuint initialCubeTranslateLocation = glGetUniformLocation(shaderProgram, "modelMatrix");
     glUniformMatrix4fv(initialCubeTranslateLocation, 1, GL_FALSE, &initialCubeTranslate[0][0]);
 
-    #pragma endregion
-    
+#pragma endregion
+
     vec3 lightPos = vec3(25.0f, 30.0f, -5.0f);
     GLuint lightLocation = glGetUniformLocation(shaderProgram, "lightPos");
     float lightRotationSpeed = 25.0f;
@@ -1187,8 +1178,7 @@ int main(int argc, char *argv[])
 
         drawScene(shaderProgram, fullModelMatrices_SRT);
 
-
-        //                             ************* RENDER THE BOX outside the passes ************* 
+        //                             ************* RENDER THE BOX outside the passes *************
         // change the VAO to the box VAO with reveresed surfaces
         setMaterial(shaderProgram, vec3(1.0f, 1.0, 1.0f), vec3(1.0f), vec3(0.2f, 0.2, 0.2f), 1);
         glBindTexture(GL_TEXTURE_2D, skyID);
@@ -1204,14 +1194,13 @@ int main(int argc, char *argv[])
         mat4 BOX_rotationMatrix = rotate(mat4(1.0f), radians(0.0f), vec3(1.0f, 0.0f, 0.0f));
         mat4 BOX_translationMatrix = translate(mat4(1.0f), vec3(0.0f, -0.3, 0.0f));
         mat4 BOX_modelMatrix = BOX_translationMatrix *
-                            BOX_rotationMatrix *
-                            BOX_scaleMatrix *
-                            initialCubeTranslate;
+                               BOX_rotationMatrix *
+                               BOX_scaleMatrix *
+                               initialCubeTranslate;
         // update the shader
         GLuint BOX_modelMatrixLocation = glGetUniformLocation(shaderProgram, "modelMatrix");
         glUniformMatrix4fv(BOX_modelMatrixLocation, 1, GL_FALSE, &BOX_modelMatrix[0][0]);
         glDrawArrays(currentRenderMode, 0, 36);
-
 
         GLuint texturedLightLocation = glGetUniformLocation(shaderProgram, "lightPos");
         glUniform3fv(texturedLightLocation, 1, &lightPos[0]);
@@ -1244,6 +1233,8 @@ int main(int argc, char *argv[])
 
         // render the whole scene (net, grid, axis, two rackets and letters, skybox)
         drawScene(shaderProgram, fullModelMatrices_SRT);
+
+        scoreboard.drawScoreboard(baseCube_VAO, shaderProgram);
 
         // End frame
         glfwSwapBuffers(window);
@@ -1313,7 +1304,6 @@ int main(int argc, char *argv[])
             currentRenderMode = GL_POINTS;
         }
 
-
         // first racket movement (WASD)
         if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
         {
@@ -1329,7 +1319,6 @@ int main(int argc, char *argv[])
         {
             translateModelVector = MY_RIGHT * (objectSpeed * dt);
             translationMatrixArray[0] = translationMatrixArray[0] * translate(mat4(1.0f), translateModelVector);
-            
         }
         if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
         {
@@ -1358,9 +1347,7 @@ int main(int argc, char *argv[])
             translateModelVector = MY_LEFT * (objectSpeed * dt);
             translationMatrixArray[1] = translationMatrixArray[1] * translate(mat4(1.0f), translateModelVector);
         }
-        
 
-        
         if (lastSpaceBarState == GLFW_RELEASE && glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
         {
 
@@ -1393,7 +1380,7 @@ int main(int argc, char *argv[])
         //                                 *** Update variables at the end of the loop ***
         // translationMatrixArray[activeRacket] = fullModel_translationMatrix;
         // rotationMatrixArray[activeRacket] = fullModel_rotationMatrix;
-        
+
         if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
         {
             activeRacket = 1;
