@@ -886,14 +886,14 @@ void drawScene(int shaderProgram, mat4 elbow [], mat4 wrist[])
 
         // look good for a now
         centers[i] = vec3(aCentre * vec4(1.0f));
-        std::cout << glm::to_string(centers[i])<< std::endl;
+        // std::cout << glm::to_string(centers[i])<< std::endl;
 
         if (i == 0){
             normals[i] = normalize(vec3(aCentre * vec4(-1.0f, 0.0f, 0.0f, 0.0f)));
         }else if (i == 1 ){
             normals[i] = normalize(vec3(aCentre * vec4(1.0f, 0.0f, 0.0f, 0.0f)));
         }
-        std::cout << glm::to_string(normals[i])<< std::endl;
+        // std::cout << glm::to_string(normals[i])<< std::endl;
 
         // ***************************************************************************
         // ***************************************************************************
