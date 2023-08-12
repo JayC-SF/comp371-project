@@ -11,7 +11,7 @@ aScale(mat4(1.f)),
 aRotation(mat4(1.f)), 
 aRadius(1.f), 
 aIsUpdated(false),
-aMaxVelocity(1.f)
+aMaxSpeed(1.f)
 {}
 
 TennisBall::TennisBall(GLfloat pRadius):
@@ -20,7 +20,7 @@ aScale(scale(mat4(1.f), vec3(pRadius))),
 aRotation(mat4(1.f)), 
 aRadius(pRadius), 
 aIsUpdated(false), 
-aMaxVelocity(1.f)
+aMaxSpeed(1.f)
 {}
 
 TennisBall::TennisBall(GLfloat pRadius, vec3 initPosition, vec3 initVelocity, vec3 initAcceleration, GLfloat pMaxVelocity):
@@ -32,7 +32,7 @@ aIsUpdated(false){
     SetAcceleration(initAcceleration);
     SetPosition(initPosition);
     SetVelocity(initVelocity);
-    aMaxVelocity = pMaxVelocity;
+    aMaxSpeed = pMaxVelocity;
 }
 
 void TennisBall::Draw(GLuint pShaderProgramId, GLuint pModelMatrixLocation) {
@@ -78,13 +78,20 @@ void TennisBall::UpdatePhysics(GLfloat dt) {
     // calculate position
     aCurrentPosition += aCurrentVelocity*dt + aCurrentAcceleration*dt*dt/2.f ;
     aCurrentVelocity += aCurrentAcceleration*dt;
-    
-    GLfloat currentSpeed = length(aCurrentVelocity);
 
-    if (aMaxVelocity < currentSpeed)
-       aCurrentVelocity =  (aCurrentVelocity/currentSpeed)*aMaxVelocity;
+    vec3 currentHorizontalVelocity = vec3(aCurrentVelocity.x, 0.0f, aCurrentVelocity.z);
+    GLfloat currentHorizontalSpeed = length(currentHorizontalVelocity);
 
-    // calculate velocity
+    // cap currentHorizontalSpeed to max velocity allowed
+    if (aMaxSpeed < currentHorizontalSpeed) {
+        
+       // transforms velocity into unit vector and assign it the speed of max velocity
+       currentHorizontalVelocity = (currentHorizontalVelocity/currentHorizontalSpeed)*aMaxSpeed;
+       aCurrentVelocity.x = currentHorizontalVelocity.x;
+       aCurrentVelocity.z = currentHorizontalVelocity.z;
+    }
+
+    // calculate new velocity and collisions
     CheckCollisions();
     aIsUpdated = false;
 }
@@ -111,7 +118,7 @@ void TennisBall::CheckCollisions() {
             // if (planeVelocity == vec3(0.f))
                 // aCurrentVelocity = reflect(aCurrentVelocity, planeNormal)*0.9f;
             // else
-            aCurrentVelocity = reflect(aCurrentVelocity, planeNormal) + planeVelocity*0.9f;
+            aCurrentVelocity = reflect(aCurrentVelocity, planeNormal) + planeVelocity;
             
         }
         

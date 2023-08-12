@@ -197,6 +197,7 @@ struct TexturedColoredVertex
     vec3 normal;
     vec2 uv;
 };
+
 int create_modelCube_VAO()
 {
     const TexturedColoredVertex texturedCubeVertexArray[] = {

@@ -41,7 +41,7 @@ class TennisBall {
     vec3 aCurrentPosition;
     vector<Plane *> aCollidingPlanes;
     vector<bool> aCollidingStates;
-    GLfloat aMaxVelocity;
+    GLfloat aMaxSpeed;
 
 };
 #endif
