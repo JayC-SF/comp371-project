@@ -8,6 +8,7 @@
 #include <random>
 #include <fstream> // std::ifstream
 #include <sstream> // std::stringstream, std::stringbuf
+#include "glm/gtx/string_cast.hpp"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
@@ -39,7 +40,22 @@ vec3 colorLightBlue(0.678f, 0.847f, 0.902f);
 int renderMode = 0;
 int currentRenderMode = GL_TRIANGLES;
 
-// Variables or moving the model ASWD
+vec3 normal_1;
+vec3 normal_2;
+
+vec3 normals[2] = { // normals for racket1 (+x) and racket2 (-x)
+    normal_1 = vec3(1.0f),
+    normal_2 = vec3(1.0f)
+};
+
+vec3 centre_1;
+vec3 centre_2;
+
+vec3 centers[2] = { // normals for racket1 (+x) and racket2 (-x)
+    centre_1 = vec4(1.0f),
+    centre_2 = vec4(1.0f)
+};
+
 // Directional vectors
 vec3 MY_LEFT(-1.0f, 0.0f, 0.0f);
 vec3 MY_RIGHT(1.0f, 0.0f, 0.0f);
@@ -47,7 +63,6 @@ vec3 MY_UP(0.0f, 1.0f, 0.0f);
 vec3 MY_DOWN(0.0f, -1.0f, 0.0f);
 vec3 MY_FORWARD(0.0f, 0.0f, -1.0f);
 vec3 MY_BACKWARD(0.0f, 0.0f, 1.0f);
-
 
 GLuint loadTexture(const char *filename)
 {
@@ -168,39 +183,6 @@ int shader(const char *vertexPath, const char *fragmentPath) // doesn't change, 
     glDeleteShader(fragment);
 
     return ID;
-}
-
-int createVAO_Grid()
-{
-    // line on the x axis from -1 to 1
-    vec3 grid_Line[] = {
-        // first point
-        vec3(1.0f, 0.0f, 0.0f),
-
-        // second point
-        vec3(-1.0f, 0.0f, 0.0f),
-    };
-
-    // Create a vertex array (VAO)
-    GLuint VAO_grid;
-    glGenVertexArrays(1, &VAO_grid);
-    glBindVertexArray(VAO_grid);
-
-    // Create a VBO
-    GLuint VBO_grid;
-    glGenBuffers(1, &VBO_grid);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO_grid);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(grid_Line), grid_Line, GL_STATIC_DRAW);
-
-    // Create a position pointer
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vec3), (void *)0);
-    glEnableVertexAttribArray(0);
-
-    // unbind the VBO and the VAO and the EBO
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-    return VAO_grid;
 }
 
 struct TexturedColoredVertex
@@ -414,39 +396,43 @@ int create_modelCube_VAO_skyBox()
     return vertexArrayObject;
 }
 
-float randomGen()
+// loads a cubemap texture from 6 individual texture faces
+// order:
+// +X (right)
+// -X (left)
+// +Y (top)
+// -Y (bottom)
+// +Z (front)
+// -Z (back)
+// -------------------------------------------------------
+unsigned int loadCubemap(vector<std::string> faces)
 {
-    // Create a random number generator engine
-    random_device rd;
-    mt19937 generator(rd());
+    unsigned int textureID;
+    glGenTextures(1, &textureID);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
 
-    // Define the range for random numbers
-    float min = -120.0f;
-    float max = +120.0f;
+    int width, height, nrChannels;
+    for (unsigned int i = 0; i < faces.size(); i++)
+    {
+        unsigned char *data = stbi_load(faces[i].c_str(), &width, &height, &nrChannels, 0);
+        if (data)
+        {
+            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+            stbi_image_free(data);
+        }
+        else
+        {
+            std::cout << "Cubemap texture failed to load at path: " << faces[i] << std::endl;
+            stbi_image_free(data);
+        }
+    }
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
-    // Create a distribution for the range
-    std::uniform_int_distribution<int> distribution(min, max);
-
-    // Generate a random number
-    int randomNum = distribution(generator);
-    return randomNum / 7.0f;
-}
-float randomGenY()
-{
-    // Create a random number generator engine
-    random_device rd;
-    mt19937 generator(rd());
-
-    // Define the range for random numbers
-    float min = 0.0f;
-    float max = +100.0f;
-
-    // Create a distribution for the range
-    std::uniform_int_distribution<int> distribution(min, max);
-
-    // Generate a random number
-    int randomNum = distribution(generator);
-    return randomNum / 7.0f;
+    return textureID;
 }
 
 void setProjectionMatrix(int shaderProgram, mat4 projectionMatrix)
@@ -508,14 +494,20 @@ void setSpotLight(int shaderProgram, vec3 position, float intensity, int current
     GLuint LALocation = glGetUniformLocation(shaderProgram, "spotLlookAtPos");
     glUniform3fv(LALocation, 1, &LookAtVector[0]);
 }
+void setLightPos(int shaderProgram, vec3 pos){
+    GLuint texturedLightLocation = glGetUniformLocation(shaderProgram, "lightPos");
+    glUniform3fv(texturedLightLocation, 1, &pos[0]);
+}
+void setShadowMap(int shaderProgram, int value){
+    GLuint depthTexturedLocation = glGetUniformLocation(shaderProgram, "shadowMap");
+    glUniform1i(depthTexturedLocation, value);
+}
 
 // ************************* GLOBALIZATION FOR THE DRAWSCENE FUNCTION PARAMETERS ***************************
 // load textures
 GLuint brickID,skyID,cementID,glossyID,woodID,fabricID,metalID,tennisID, ballID;
 
 // *** Creating the VAOs ***
-// grid VAO
-int grid_VAO;
 
 // the xyz axis coordinates
 int baseCube_VAO;
@@ -527,8 +519,8 @@ int skyBox_VAO_inside;
 // To create the rackets. These matrices set the inital position of the
 // Rackets
 mat4 translationMatrixArray[2] = {
-    translate(mat4(1.0f), vec3(-20.0f, 0.5, 8.0f)), // racket 1
-    translate(mat4(1.0f), vec3(20.0f, 0.5, -8.0f))}; // racket 2
+    translate(mat4(1.0f), vec3(-25.0f, 0.5, 8.0f)), // racket 1
+    translate(mat4(1.0f), vec3(25.0f, 0.5, -8.0f))}; // racket 2
 
 // Set the initial orientation of the rackets
 mat4 rotationMatrixArray[2] = {
@@ -538,6 +530,31 @@ mat4 rotationMatrixArray[2] = {
 mat4 fullModel_translationMatrix(1.0f);
 mat4 fullModel_rotationMatrix(1.0f);
 mat4 racketHandle_groupMatrix;
+
+float totalShoulderRotation1 = radians(0.0f);
+float totalElbowRotation1 = radians(0.0f);
+float totalElbowRotationbackwards1 = radians(0.0f);
+float totalElbowRotationbackwards2 = radians(0.0f);
+float totalWristRotation1 = radians(0.0f);
+
+float totalShoulderRotation2 = radians(0.0f);
+float totalElbowRotation2 = radians(0.0f);
+float totalWristRotation2 = radians(0.0f);
+
+mat4 elbowFlexor_rotationMatrix1;
+mat4 wristFlexor_rotationMatrix1;
+mat4 elbowFlexor_rotationMatrix2;
+mat4 wristFlexor_rotationMatrix2;
+
+mat4 elbow [2] = {
+    elbowFlexor_rotationMatrix1 = mat4(1.0f),
+    elbowFlexor_rotationMatrix2 = mat4(1.0f)
+};
+
+mat4 wrist [2] = {
+    wristFlexor_rotationMatrix1 = mat4(1.0f),
+    wristFlexor_rotationMatrix2 = mat4(1.0f)
+};
 
 // sphere VAO 
 // source code obtained from here: https://github.com/carl-vbn/opengl-gravity-simulator/blob/main/src/rendering/baseModels/sphere.cpp
@@ -652,7 +669,7 @@ int resolution = 65;
 int vertexCount = 6 * (resolution / 2) * resolution + 1;
 GLuint sphere;
 
-void drawScene(int shaderProgram, mat4 fullModelMatrices_SRT[])
+void drawScene(int shaderProgram, mat4 elbow [], mat4 wrist[])
 {
     // SRT for the upper arm
     // Model matrix components for the upper arm
@@ -809,7 +826,7 @@ void drawScene(int shaderProgram, mat4 fullModelMatrices_SRT[])
         // Elbow group matrix that contains the shoulder group matrix
         #pragma region 
         // group matrix 2
-        mat4 elbow_groupMatrix = shoulder_groupMatrix  * lowerArm_translationMatrix * /* elbowFlexor_rotationMatrix  * */ lowerArm_rotationMatrix;
+        mat4 elbow_groupMatrix = shoulder_groupMatrix  * lowerArm_translationMatrix * elbow[i]  *  lowerArm_rotationMatrix;
         // Lower arm model matrix
         mat4 lowerArm_modelMatrix = elbow_groupMatrix * lowerArm_scaleMatrix * translate(mat4(1.0f), vec3(0.0f, 0.5f, 0.0f));
         // update the shader
@@ -822,7 +839,7 @@ void drawScene(int shaderProgram, mat4 fullModelMatrices_SRT[])
         glBindTexture(GL_TEXTURE_2D, fabricID);
         #pragma region 
         // group matrix 3
-        mat4 hand_groupMatrix = elbow_groupMatrix * hand_translationMatrix * /* wrist_Flex_RotationMatrix * */ hand_rotationMatrix;
+        mat4 hand_groupMatrix = elbow_groupMatrix * hand_translationMatrix *  wrist[i] *  hand_rotationMatrix;
                                         
         mat4 hand_modelMatrix = hand_groupMatrix * hand_scaleMatrix *translate(mat4(1.0f), vec3(0.0f, 0.5f, 0.0f));
         setColorUniform(shaderProgram, colorSkin);
@@ -830,7 +847,7 @@ void drawScene(int shaderProgram, mat4 fullModelMatrices_SRT[])
         GLuint hand_modelMatrixLocation = glGetUniformLocation(shaderProgram, "modelMatrix");
         glUniformMatrix4fv(hand_modelMatrixLocation, 1, GL_FALSE, &hand_modelMatrix[0][0]);
         glDrawArrays(currentRenderMode, 0, 36);
-        #pragma endregion
+        #pragma endregione
 
         // MODIFY THE LIGHT COMPONENTS TO REALLY METALIC LOOK.
         //                                 amb                            diff                             spec                                shine
@@ -844,6 +861,7 @@ void drawScene(int shaderProgram, mat4 fullModelMatrices_SRT[])
         // create the model matrix
         racketHandle_groupMatrix = elbow_groupMatrix *
                                    racketHandle_translationMatrix *
+                                    wrist[i] *
                                    racketHandle_rotationMatrix;
 
         mat4 racketHandle_modelMatrix = racketHandle_groupMatrix *
@@ -857,6 +875,32 @@ void drawScene(int shaderProgram, mat4 fullModelMatrices_SRT[])
         GLuint racketHandle_modelMatrixLocation = glGetUniformLocation(shaderProgram, "modelMatrix");
         glUniformMatrix4fv(racketHandle_modelMatrixLocation, 1, GL_FALSE, &racketHandle_modelMatrix[0][0]);
         glDrawArrays(currentRenderMode, 0, 36);
+
+        // ******************* two centres of the racket planes **********************
+        // ***************************************************************************
+        
+        mat4 aCentre = racketHandle_groupMatrix * translate(mat4(1.0f), vec3(0.0f, 3.05f, 0.0f));
+        GLuint centreLocation = glGetUniformLocation(shaderProgram, "modelMatrix");
+        glUniformMatrix4fv(centreLocation, 1, GL_FALSE, &aCentre[0][0]);
+        // glDrawArrays(currentRenderMode, 0, 36);
+
+        // look good for a now
+        centers[i] = vec3(aCentre * vec4(1.0f));
+        std::cout << glm::to_string(centers[i])<< std::endl;
+
+        if (i == 0){
+            normals[i] = normalize(vec3(aCentre * vec4(-1.0f, 0.0f, 0.0f, 0.0f)));
+        }else if (i == 1 ){
+            normals[i] = normalize(vec3(aCentre * vec4(1.0f, 0.0f, 0.0f, 0.0f)));
+        }
+        std::cout << glm::to_string(normals[i])<< std::endl;
+
+        // ***************************************************************************
+        // ***************************************************************************
+
+        
+
+
 
         //                                 *** RENDER THE RACKET BOTTOM BRACKET ***
         // Model matrix components for the racket bottom bracket
@@ -945,10 +989,11 @@ void drawScene(int shaderProgram, mat4 fullModelMatrices_SRT[])
             glDrawArrays(currentRenderMode, 0, 36);
         }
     }
-        // ********************************** SHPERE *******************************************
+
+    // ********************************** SHPERE *******************************************
     mat4 sphere_scaleMatrix = scale(mat4(1.0f), vec3(1.0f, 1.0f, 1.0f));
     mat4 sphere_rotationMatrix = rotate(mat4(1.0f), radians(0.0f), vec3(0.0f, 1.0f, 0.0f));
-    mat4 sphere_translationMatrix = translate(mat4(1.0f), vec3(17.0f, 5.0f, -10.5f));
+    mat4 sphere_translationMatrix = translate(mat4(1.0f), vec3(23.0f, 5.0f, -10.5f));
     mat4 sphere_MVP = sphere_translationMatrix * sphere_scaleMatrix * sphere_rotationMatrix;
     setColorUniform(shaderProgram, colorWhite);
     setModelMatrix(shaderProgram, sphere_MVP);
@@ -960,6 +1005,36 @@ void drawScene(int shaderProgram, mat4 fullModelMatrices_SRT[])
     glBindTexture(GL_TEXTURE_2D, ballID);
     setColorUniform(shaderProgram, colorLightBlue);
     glDrawElements(GL_TRIANGLES, vertexCount ,GL_UNSIGNED_INT,(void*)0);
+}
+
+void drawSkyCube(int shaderProgram){
+    //                             ************* RENDER THE BOX outside the passes ************* 
+    // matrix that translates the initial cube upwards by 0.5
+    mat4 initialCubeTranslate = translate(mat4(1.0f), vec3(0.0f, 0.5f, 0.0f));
+    GLuint initialCubeTranslateLocation = glGetUniformLocation(shaderProgram, "modelMatrix");
+    glUniformMatrix4fv(initialCubeTranslateLocation, 1, GL_FALSE, &initialCubeTranslate[0][0]);
+
+    // change the VAO to the box VAO with reveresed surfaces
+    setMaterial(shaderProgram, vec3(1.0f, 1.0, 1.0f), vec3(1.0f), vec3(0.2f, 0.2, 0.2f), 1);
+    glBindTexture(GL_TEXTURE_2D, skyID);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+    glBindVertexArray(skyBox_VAO_inside);
+    // change the color of in the shader
+    setColorUniform(shaderProgram, colorBeige);
+
+
+    // MVP matrices to create the model matrix of the BOX
+    mat4 BOX_scaleMatrix = scale(mat4(1.0f), vec3(87.0f, 30.0f, 45.0f));
+    mat4 BOX_rotationMatrix = rotate(mat4(1.0f), radians(0.0f), vec3(1.0f, 0.0f, 0.0f));
+    mat4 BOX_translationMatrix = translate(mat4(1.0f), vec3(0.0f, -0.3, 0.0f));
+    mat4 BOX_modelMatrix = BOX_translationMatrix *
+                        BOX_rotationMatrix *
+                        BOX_scaleMatrix *
+                        initialCubeTranslate;
+    // update the shader
+    setModelMatrix(shaderProgram, BOX_modelMatrix);
+    glDrawArrays(currentRenderMode, 0, 36);
 }
 
 int main(int argc, char *argv[])
@@ -1002,15 +1077,10 @@ int main(int argc, char *argv[])
     glClearColor(0.248f, 0.333f, 0.337f, 1.0f);
 
     // Compile and link shaders
-    // int shaderProgram = compileAndLinkShaders(getVertexShaderSource(), getFragmentShaderSource());
     int shaderProgram = shader("../shaders/vertexShaderSource.glsl", "../shaders/fragmentShaderSource.glsl");
     int depthShaderProgram = shader("../shaders/depthVertexShaderSource.glsl", "../shaders/depthFragmentShaderSource.glsl");
 
     // *** Creating the VAOs ***
-    // grid VAO
-    grid_VAO = createVAO_Grid();
-
-    // the xyz axis coordinates
     baseCube_VAO = create_modelCube_VAO();
 
     // skybox with inverted direction
@@ -1018,7 +1088,7 @@ int main(int argc, char *argv[])
 
     // viewMatrix components
     mat4 viewMatrix(1.0f);
-    vec3 cameraPosition = vec3(35.0f, 20.0f, 0.0f);
+    vec3 cameraPosition = vec3(40.0f, 20.0f, 0.0f);
     vec3 lookAtPoint = vec3(0.0f, 0.0f, 0.0f);
     vec3 upVector = vec3(0.0f, 1.0f, 0.0f);
 
@@ -1032,31 +1102,11 @@ int main(int argc, char *argv[])
     int lastMouseLeftState = GLFW_RELEASE;
 
     // speed parameters
-    float objectSpeed = 5.0f;
+    float objectSpeed = 10.0f;
     float rotationAngle = 0.0f;
     vec3 translateModelVector(1.0f);
-    // Full model matrices to control the model
 
-    // Full model matrices to control the model
-    mat4 fullModel_translationMatrix;
-    mat4 fullModel_rotationMatrix;
-    mat4 fullModel_scaleMatrix;
-
-    mat4 fullModelMatrices_SRT[] = {
-        fullModel_translationMatrix = mat4(1.0f),
-        fullModel_rotationMatrix = mat4(1.0f),
-        fullModel_scaleMatrix = mat4(1.0f)};
-
-    // active racket index to view and move
-    int activeRacket = 1;
-
-    // declare the matrices used to change the group matrix
-    // based on the active racket to apply input changes
-    fullModel_translationMatrix = translationMatrixArray[activeRacket];
-    fullModel_rotationMatrix = rotationMatrixArray[activeRacket];
-
-    // vec3 model_position = vec3(fullModelMatrices_SRT[activeRacket][0][3], fullModelMatrices_SRT[activeRacket][1][3], fullModelMatrices_SRT[activeRacket][2][3]);
-
+    mat4 projectionMatrix(1.0f);
     // Enable Backface culling
     glEnable(GL_CULL_FACE);
 
@@ -1078,6 +1128,7 @@ int main(int argc, char *argv[])
     int useTexture = 1;
     setUseTexture(shaderProgram, 1);
     int lastTstate = GLFW_RELEASE;
+
     // load textures
     brickID = loadTexture("../assets/textures/brick.jpg");
     skyID = loadTexture("../assets/textures/sky.jpg");
@@ -1088,7 +1139,7 @@ int main(int argc, char *argv[])
     metalID = loadTexture("../assets/textures/metal.jpg");
     tennisID = loadTexture("../assets/textures/court1.jpg");
     ballID = loadTexture("../assets/textures/tennis2.jpg");
-
+    
     // SET THE LIGHT COMPONENTS TO STARTING VALUES
     vec3 setAmbient = vec3(1.0, 1.0, 1.0);
     vec3 setDiffuse = vec3(1.0, 1.0, 1.0);
@@ -1097,7 +1148,6 @@ int main(int argc, char *argv[])
     setMaterial(shaderProgram, setAmbient, setDiffuse, setSpecular, shine);
 
     // ******************* SHADOWS ********************
-    // GLuint depthMap;
     GLuint depthMapFBO;
     glGenFramebuffers(1, &depthMapFBO);
     glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
@@ -1142,6 +1192,7 @@ int main(int argc, char *argv[])
         float dt = glfwGetTime() - lastFrameTime;
         lastFrameTime += dt;
 
+
         // ***************** SHADOW *****************
         glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
         glViewport(0, 0, shadowWidth, shadowHeight);
@@ -1160,11 +1211,12 @@ int main(int argc, char *argv[])
 
         glUniformMatrix4fv(light_MVP_Depth_MatrixLocation, 1, GL_FALSE, &light_MVP_Matrix[0][0]);
 
-        drawScene(depthShaderProgram, fullModelMatrices_SRT);
+        drawScene(depthShaderProgram, elbow, wrist);
 
         // SECOND PASS (using normal shader program)
         // -----------------------------------------
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
         // set the shader program
         glUseProgram(shaderProgram);
         glUniformMatrix4fv(light_MVP_MatrixLocation, 1, GL_FALSE, &light_MVP_Matrix[0][0]);
@@ -1174,68 +1226,37 @@ int main(int argc, char *argv[])
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // __________updating the light position everyframe_______________
+        #pragma region
         // vec4 lightPosV4 = vec4(lightPos, 1.0f);
         // // rotation of the light source around axis (1,1,1)
         // lightPosV4 = (rotate(mat4(1.0f), radians(lightRotationSpeed * dt), vec3(0.0f, 1.0f, 0.0f)) * lightPosV4);
         // lightPos = vec3(lightPosV4);
         // glUniform3fv(lightLocation, 1, &lightPos[0]);
         // ---------------------------------------------------------------
+        #pragma endregion
 
-        // Each frame, reset color of each pixel to glClearColor specified before
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glClear(GL_COLOR_BUFFER_BIT);
+        drawScene(shaderProgram, elbow, wrist);
 
-        drawScene(shaderProgram, fullModelMatrices_SRT);
-
-
-        //                             ************* RENDER THE BOX outside the passes ************* 
-        // change the VAO to the box VAO with reveresed surfaces
-        setMaterial(shaderProgram, vec3(1.0f, 1.0, 1.0f), vec3(1.0f), vec3(0.2f, 0.2, 0.2f), 1);
-        glBindTexture(GL_TEXTURE_2D, skyID);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
-        glBindVertexArray(skyBox_VAO_inside);
-        // change the color of in the shader
-        GLuint colorLocation = glGetUniformLocation(shaderProgram, "myColor");
-        glUniform3fv(colorLocation, 1, &colorBeige[0]);
-
-        // MVP matrices to create the model matrix of the BOX
-        mat4 BOX_scaleMatrix = scale(mat4(1.0f), vec3(87.0f, 30.0f, 45.0f));
-        mat4 BOX_rotationMatrix = rotate(mat4(1.0f), radians(0.0f), vec3(1.0f, 0.0f, 0.0f));
-        mat4 BOX_translationMatrix = translate(mat4(1.0f), vec3(0.0f, -0.3, 0.0f));
-        mat4 BOX_modelMatrix = BOX_translationMatrix *
-                            BOX_rotationMatrix *
-                            BOX_scaleMatrix *
-                            initialCubeTranslate;
-        // update the shader
-        GLuint BOX_modelMatrixLocation = glGetUniformLocation(shaderProgram, "modelMatrix");
-        glUniformMatrix4fv(BOX_modelMatrixLocation, 1, GL_FALSE, &BOX_modelMatrix[0][0]);
-        glDrawArrays(currentRenderMode, 0, 36);
-
-
-        GLuint texturedLightLocation = glGetUniformLocation(shaderProgram, "lightPos");
-        glUniform3fv(texturedLightLocation, 1, &lightPos[0]);
+        drawSkyCube(shaderProgram);
+        
+        setLightPos(shaderProgram, lightPos);
         // update the texture shader program with the shadowmap with 0
-        GLuint depthTexturedLocation = glGetUniformLocation(shaderProgram, "shadowMap");
-        glUniform1i(depthTexturedLocation, 1);
+        setShadowMap(shaderProgram, 1);
 
         glActiveTexture(GL_TEXTURE0 + 1);
         glBindTexture(GL_TEXTURE_2D, depthTexture);
 
+
         // set the shader program
         glUseProgram(shaderProgram);
-        glBindVertexArray(grid_VAO);
 
         // set the view matrix using the parameters needed
         viewMatrix = lookAt(cameraPosition, lookAtPoint, upVector);
-        GLuint viewMatrixLocation = glGetUniformLocation(shaderProgram, "viewMatrix");
-        glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, &viewMatrix[0][0]);
-
+        setViewMatrix(shaderProgram, viewMatrix);
         // set the projection matrix based on the parameter needed
-        mat4 projectionMatrix(1.0f);
         projectionMatrix = perspective(radians(60.0f), 1024.0f / 768.0f, 0.01f, 200.0f);
-        GLuint projectionMatrixLocation = glGetUniformLocation(shaderProgram, "projectionMatrix");
-        glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, &projectionMatrix[0][0]);
+        setProjectionMatrix(shaderProgram, projectionMatrix);
+
 
         // if i'm using only one type of textures I can just activate one texture
         glActiveTexture(GL_TEXTURE0);
@@ -1243,26 +1264,14 @@ int main(int argc, char *argv[])
         glUniform1i(textureLocation, 0);
 
         // render the whole scene (net, grid, axis, two rackets and letters, skybox)
-        drawScene(shaderProgram, fullModelMatrices_SRT);
+        drawScene(shaderProgram, elbow, wrist);
+
 
         // End frame
         glfwSwapBuffers(window);
 
         // Detect inputs
         glfwPollEvents();
-
-        // if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
-        // {
-        //     vec4 cameraPos4 = vec4(cameraPosition, 1);
-        //     cameraPos4 = rotate(mat4(1.0f), radians(-0.6f), vec3(0.0f, 1.0f, 0.0f)) * cameraPos4;
-        //     cameraPosition = vec3(cameraPos4);
-        // }
-        // if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
-        // {
-        //     vec4 cameraPos4 = vec4(cameraPosition, 1);
-        //     cameraPos4 = rotate(mat4(1.0f), radians(0.6f), vec3(0.0f, 1.0f, 0.0f)) * cameraPos4;
-        //     cameraPosition = vec3(cameraPos4);
-        // }
 
         if (glfwGetKey(window, GLFW_KEY_7) == GLFW_PRESS)
         {
@@ -1281,38 +1290,19 @@ int main(int argc, char *argv[])
             cameraPosition = vec3(cameraPos4);
         }
 
-        // after selection of the racket, update the matrices needed from the array.
-        fullModel_translationMatrix = translationMatrixArray[activeRacket];
-        fullModel_rotationMatrix = rotationMatrixArray[activeRacket];
-
         // Handle inputs
         // exit the window
         if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         {
             glfwSetWindowShouldClose(window, true);
         }
+
         // resets the position of the racket after moving it
         if (glfwGetKey(window, GLFW_KEY_H) == GLFW_PRESS)
         {
-            // reset the angle of the rackets back to facing the
-            fullModel_rotationMatrix = rotate(mat4(1.0f), -rotationAngle + radians(90.0f), vec3(0.0f, 0.1, 0.0f));
-            switch (activeRacket)
-            {
-            case 0:
-                fullModel_translationMatrix = translate(mat4(1.0f), vec3(0.0f, 0.0, -5.0f));
-                break;
-            case 1:
-                fullModel_translationMatrix = translate(mat4(1.0f), vec3(0.0f, 0.0, 5.0f));
-                break;
-            }
+            translationMatrixArray[0] = translate(mat4(1.0f), vec3(-25.0f, 0.5, 8.0f));
+            translationMatrixArray[1] = translate(mat4(1.0f), vec3(25.0f, 0.5, -8.0f));
         }
-        // render mode selection (triangle, line, point)
-
-        if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
-        {
-            currentRenderMode = GL_POINTS;
-        }
-
 
         // first racket movement (WASD)
         if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
@@ -1329,7 +1319,6 @@ int main(int argc, char *argv[])
         {
             translateModelVector = MY_RIGHT * (objectSpeed * dt);
             translationMatrixArray[0] = translationMatrixArray[0] * translate(mat4(1.0f), translateModelVector);
-            
         }
         if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
         {
@@ -1358,18 +1347,6 @@ int main(int argc, char *argv[])
             translateModelVector = MY_LEFT * (objectSpeed * dt);
             translationMatrixArray[1] = translationMatrixArray[1] * translate(mat4(1.0f), translateModelVector);
         }
-        
-
-        
-        if (lastSpaceBarState == GLFW_RELEASE && glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
-        {
-
-            float xValue = randomGen();
-            float yValue = randomGenY();
-            float zValue = randomGen();
-
-            fullModel_translationMatrix = translate(mat4(1.0f), vec3(xValue, yValue, zValue));
-        }
         if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS && lastTstate == GLFW_RELEASE)
         {
             if (useTexture == 1)
@@ -1383,72 +1360,91 @@ int main(int argc, char *argv[])
                 useTexture = 1;
             }
         }
-        lastTstate = glfwGetKey(window, GLFW_KEY_T);
 
-        if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
+        //constant factors for the racket movements.
+        const float backwardShouler1 = radians(-20.0f);
+        const float backwardShouler2 = radians(20.0f);
+
+        const float minElbowFlex1 = radians(-15.0f); 
+        const float minElbowFlex2 = radians(-15.0f); 
+
+        const float maxCurl1 = radians(35.0f);  
+        const float maxCurl2 = -radians(35.0f);  
+
+        const float maxShoulder1 = radians(30.0f);
+        const float maxShoulder2 = -radians(50.0f);
+
+        if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS ) 
+        {   
+            if(totalElbowRotationbackwards1 > backwardShouler1){
+                rotationMatrixArray[1] = rotate(rotationMatrixArray[1], -radians(0.7f), vec3(0.0f, 0.0f, 1.0f));
+                totalElbowRotationbackwards1 -=  radians(0.7f);
+            }else {
+                if(totalElbowRotation1 > minElbowFlex1 ){
+                    elbow[1] = rotate(elbow[1], radians(0.3f), vec3(1.0f, 0.0f, 0.0f)); 
+                    totalElbowRotation1 -= radians(0.3f);
+                }
+                if(totalShoulderRotation1 < maxShoulder1){
+                    rotationMatrixArray[1] = rotate(rotationMatrixArray[1], radians(1.2f), vec3(0.0f, 0.0f, 1.0f));
+                    totalShoulderRotation1 +=  radians(1.2f);
+                }
+                if(totalWristRotation1 < maxCurl1){
+                    wrist[1] = rotate(wrist[1], radians(0.6f), vec3(0.0f, 0.0f, 1.0f)); 
+                    totalWristRotation1 += radians(0.6f);
+                }
+            }
+        } else if(glfwGetKey(window, GLFW_KEY_L) == GLFW_RELEASE){
+            elbow[1] = mat4(1.0f);
+            totalElbowRotation1 = 0;
+            rotationMatrixArray[1] = rotate(mat4(1.0f), radians(-30.0f), vec3(1.0f, 0.0f, 0.0f));
+            totalShoulderRotation1 = 0;
+            wrist[1] = rotate(mat4(1.0f), radians(0.0f), vec3(1.0f, 0.0f, 0.0f));
+            totalWristRotation1 = 0;
+            totalElbowRotationbackwards1 = 0.0f;
+        }
+
+        if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS ) 
         {
-            selectCamera = 0;
+            if(totalElbowRotationbackwards2 < backwardShouler2){
+                rotationMatrixArray[0] = rotate(rotationMatrixArray[0], +radians(0.7f), vec3(0.0f, 0.0f, 1.0f));
+                totalElbowRotationbackwards2 +=  radians(0.7f);
+            } else {
+                if(totalElbowRotation2 > minElbowFlex2 ){
+                    elbow[0] = rotate(elbow[0], radians(0.5f), vec3(1.0f, 0.0f, 0.0f)); 
+                    totalElbowRotation2 -= radians(0.5f);
+                }
+                if(totalShoulderRotation2 > maxShoulder2){
+                    rotationMatrixArray[0] = rotate(rotationMatrixArray[0], -radians(1.2f), vec3(0.0f, 0.0f, 1.0f));
+                    totalShoulderRotation2 -=  radians(1.2f);
+                }
+                if(totalWristRotation2 < maxCurl2){
+                    wrist[0] = rotate(wrist[0], -radians(0.6f), vec3(0.0f, 0.0f, 1.0f)); 
+                    totalWristRotation2 -= radians(0.6f);
+                }
+            }
+        } else if(glfwGetKey(window, GLFW_KEY_E) == GLFW_RELEASE){
+            elbow[0] = mat4(1.0f);
+            totalElbowRotation2 = 0.0f;
+            rotationMatrixArray[0] = rotate(mat4(1.0f), radians(-30.0f), vec3(1.0f, 0.0f, 0.0f));
+            totalShoulderRotation2 = 0.0f;
+            wrist[0] = rotate(mat4(1.0f), radians(0.0f), vec3(1.0f, 0.0f, 0.0f));
+            totalWristRotation2 = 0.0f;
+            totalElbowRotationbackwards2 = 0.0f;
         }
 
         //                                 *** Update variables at the end of the loop ***
-        // translationMatrixArray[activeRacket] = fullModel_translationMatrix;
-        // rotationMatrixArray[activeRacket] = fullModel_rotationMatrix;
         
-        if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
-        {
-            activeRacket = 1;
+        lastTstate = glfwGetKey(window, GLFW_KEY_T);
+        if(glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS){
+            cameraPosition = vec3(-40.0f, 20.0f, 0.0f);
         }
-        if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
-        {
-            activeRacket = 0;
+        if(glfwGetKey(window, GLFW_KEY_V) == GLFW_PRESS){
+            cameraPosition = vec3(40.0f, 20.0f, 0.0f);
         }
 
-        // toggle between camera with a rotating camera position
-        // vec3 defaultCameraPosition = vec3(15.0f, 20.0f, 30.0f);
-
-        // vec3 movingR_AB_Camera = vec3(translationMatrixArray[0] * vec4(rABCameraPosition, 1.0f));
-        // vec3 movingR_IB_Camera = vec3(translationMatrixArray[1] * vec4(rIBCameraPosition, 1.0f));
-        // if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS && lastMState == GLFW_RELEASE)
-        // {
-        //     selectCamera++;
-        //     // reset the camera counter
-        //     if (selectCamera == 4)
-        //     {
-        //         selectCamera = 0;
-        //     }
-        //     // if racket one is selected
-        //     if (selectCamera == 1)
-        //     {
-        //         activeRacket = 0;
-        //     }
-        //     // if racket two is selected
-        //     if (selectCamera == 2)
-        //     {
-        //         activeRacket = 1;
-        //     }
-        //     if (selectCamera == 3)
-        //     {
-        //         cameraPosition = vec3(10.0f, 10.0f, 25.0f);
-        //     }
-        // }
-        // vec3 cameraPositions[] = {defaultCameraPosition, movingR_AB_Camera, movingR_IB_Camera, cameraPosition};
-
-        // if (selectCamera > 0 && selectCamera < 3)
-        // {
-        //     lookAtPoint = vec3(translationMatrixArray[activeRacket] * vec4(0.0f, 4.0f, 0.0, 1.0f));
-        // }
-        // else
-        //     lookAtPoint = vec3(0.0f, 4.0f, 0.0f);
-
-        // // update camera position
-        // cameraPosition = cameraPositions[selectCamera];
-
-        // lastMState = glfwGetKey(window, GLFW_KEY_M);
         // update the space bar status.
         lastSpaceBarState = glfwGetKey(window, GLFW_KEY_SPACE);
         lastAState = glfwGetKey(window, GLFW_KEY_A);
-
-        // setSpotLight(shaderProgram, cameraPosition, 0.7f, selectCamera, vec3(0.0f, 4.0f, 0.0f));
     }
 
     // unbind VAO
