@@ -93,10 +93,7 @@ void TennisBall::CheckCollisions() {
         GLfloat projMag = dot(planeToSphereCenter, planeNormal);
         
         if (projMag <= aRadius) {
-            double length = aCurrentVelocity.x*aCurrentVelocity.x + aCurrentVelocity.y*aCurrentVelocity.y + aCurrentVelocity.z*aCurrentVelocity.z;
             aCurrentVelocity = reflect(aCurrentVelocity, planeNormal);
-            double length1 = aCurrentVelocity.x*aCurrentVelocity.x + aCurrentVelocity.y*aCurrentVelocity.y + aCurrentVelocity.z*aCurrentVelocity.z;
-            // aCurrentVelocity.y = -aCurrentVelocity.y;
         }
     }
 }
