@@ -11,7 +11,7 @@ class TennisBall {
     public:
     TennisBall();
     TennisBall(GLfloat pRadius);
-    TennisBall(GLfloat pRadius, vec3 initPosition, vec3 initVelocity, vec3 initAcceleration);
+    TennisBall(GLfloat pRadius, vec3 initPosition, vec3 initVelocity, vec3 initAcceleration, GLfloat pMaxVelocity);
 
     void Draw(GLuint pShaderProgramId, GLuint pModelMatrixLocation);
     void Translate(vec3 pTranslate);
@@ -40,6 +40,8 @@ class TennisBall {
     vec3 aCurrentVelocity;
     vec3 aCurrentPosition;
     vector<Plane *> aCollidingPlanes;
+    vector<bool> aCollidingStates;
+    GLfloat aMaxVelocity;
 
 };
 #endif

@@ -1003,7 +1003,7 @@ void drawScene(int shaderProgram, mat4 elbow [], mat4 wrist[])
 
     setMaterial(shaderProgram, vec3(1.0f), vec3(1.0f), vec3(0.1, 0.1, 0.1), 2.0f);
 
-    sphere = createSphere(resolution, 0.3f);
+    sphere = createSphere(resolution, .3f);
     glBindVertexArray(sphere);
     glBindTexture(GL_TEXTURE_2D, ballID);
     setColorUniform(shaderProgram, colorLightBlue);
@@ -1191,9 +1191,29 @@ int main(int argc, char *argv[])
     vec3 rABCameraPosition = vec3(0.0f, 7, -15.0f);
     vec3 rIBCameraPosition = vec3(0.0f, 7, 15.0f);
 
-    tennisBall = TennisBall(0.5f, vec3(0.f, 0.f, 0.f), vec3(0.f, 15.f, 0.f), vec3(0.f, -10.f, 0.f));
+    tennisBall = TennisBall(.3f, vec3(0.f, 8.f, 0.f), vec3(5.f, 7.f, 0.f), vec3(0.f, -10.f, 0.f), 20.f);
+
     Plane groundPlane(100, 100, MY_UP, vec3(0.f));
+    Plane netPlane(100, 100, MY_RIGHT, vec3(0.f));
+    Plane backCourtPlane(100, 100, MY_LEFT, vec3(37.f, 0.f, 0.f));
+    Plane frontCourtPlane(100, 100, MY_RIGHT, vec3(-37.f, 0.f, 0.f));
+    Plane rightCourtPlane(100, 100, MY_FORWARD, vec3(0.f, 0.f, -22.5f));
+    Plane leftCourtPlane(100, 100, MY_BACKWARD, vec3(0.f, 0.f, 22.5f));
+
+    Plane racket1Plane(1.3, 1.7, normals[0], centers[0]);
+    Plane racket2Plane(1.3, 1.7, normals[1], centers[1]);
+
+    
     tennisBall.AddCollidingPlane(&groundPlane);
+    tennisBall.AddCollidingPlane(&racket1Plane);
+    tennisBall.AddCollidingPlane(&racket2Plane);
+    tennisBall.AddCollidingPlane(&netPlane);
+    tennisBall.AddCollidingPlane(&backCourtPlane);
+    tennisBall.AddCollidingPlane(&frontCourtPlane);
+    tennisBall.AddCollidingPlane(&rightCourtPlane);
+    tennisBall.AddCollidingPlane(&leftCourtPlane);
+
+
     // Entering Main Loop
     while (!glfwWindowShouldClose(window))
     {
@@ -1246,7 +1266,10 @@ int main(int argc, char *argv[])
 
         drawScene(shaderProgram, elbow, wrist);
 
+        racket1Plane.UpdatePhysics(centers[0], normals[0], dt);
+        racket2Plane.UpdatePhysics(centers[1], normals[1], dt);
         tennisBall.UpdatePhysics(dt);
+
 
         drawSkyCube(shaderProgram);
         

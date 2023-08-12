@@ -16,6 +16,12 @@ class Plane{
     GLfloat GetHeight();
     vec3 GetCenterPosition();
     vec3 GetEdgeDirection();
+    vec3 GetVelocity();
+    
+    void SetPosition(vec3 pPosition);
+    void SetNormal(vec3 pNormal);
+    void UpdatePhysics(vec3 pPosition, vec3 pNormal, GLfloat dt);
+
     // void GetCornerPoints(vector<vec3> & points);
     // void Rotate(GLfloat pRads, vec3 pDirection);
 
@@ -27,6 +33,7 @@ class Plane{
     // this vector will be used to always point towards the same edge
     vec3 aEdgeDirection;
     vec3 aCenterPosition;
+    vec3 aVelocity;
     
 };
 #endif

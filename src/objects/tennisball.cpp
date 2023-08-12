@@ -1,6 +1,7 @@
 #include "tennisball.h"
 #include "atoms/sphere.h"
 #include "../texture.h"
+#include "glm/geometric.hpp"
 #include <cstdio>
 #include <iostream>
 
@@ -9,7 +10,8 @@ aModelMatrix(mat4(1.f)),
 aScale(mat4(1.f)), 
 aRotation(mat4(1.f)), 
 aRadius(1.f), 
-aIsUpdated(false)
+aIsUpdated(false),
+aMaxVelocity(1.f)
 {}
 
 TennisBall::TennisBall(GLfloat pRadius):
@@ -17,10 +19,11 @@ aModelMatrix(mat4(1.f)),
 aScale(scale(mat4(1.f), vec3(pRadius))), 
 aRotation(mat4(1.f)), 
 aRadius(pRadius), 
-aIsUpdated(false)
+aIsUpdated(false), 
+aMaxVelocity(1.f)
 {}
 
-TennisBall::TennisBall(GLfloat pRadius, vec3 initPosition, vec3 initVelocity, vec3 initAcceleration):
+TennisBall::TennisBall(GLfloat pRadius, vec3 initPosition, vec3 initVelocity, vec3 initAcceleration, GLfloat pMaxVelocity):
 aModelMatrix(mat4(1.f)), 
 aScale(scale(mat4(1.f), vec3(pRadius))), 
 aRotation(mat4(1.f)), 
@@ -29,6 +32,7 @@ aIsUpdated(false){
     SetAcceleration(initAcceleration);
     SetPosition(initPosition);
     SetVelocity(initVelocity);
+    aMaxVelocity = pMaxVelocity;
 }
 
 void TennisBall::Draw(GLuint pShaderProgramId, GLuint pModelMatrixLocation) {
@@ -74,6 +78,12 @@ void TennisBall::UpdatePhysics(GLfloat dt) {
     // calculate position
     aCurrentPosition += aCurrentVelocity*dt + aCurrentAcceleration*dt*dt/2.f ;
     aCurrentVelocity += aCurrentAcceleration*dt;
+    
+    GLfloat currentSpeed = length(aCurrentVelocity);
+
+    if (aMaxVelocity < currentSpeed)
+       aCurrentVelocity =  (aCurrentVelocity/currentSpeed)*aMaxVelocity;
+
     // calculate velocity
     CheckCollisions();
     aIsUpdated = false;
@@ -81,6 +91,7 @@ void TennisBall::UpdatePhysics(GLfloat dt) {
 
 void TennisBall::AddCollidingPlane(Plane * pPlane) {
     aCollidingPlanes.push_back(pPlane);
+    aCollidingStates.push_back(false);
 }
 
 void TennisBall::CheckCollisions() {
@@ -92,9 +103,19 @@ void TennisBall::CheckCollisions() {
         // since normal is already a unit vector, no need to divide by magnitude
         GLfloat projMag = dot(planeToSphereCenter, planeNormal);
         
-        if (projMag <= aRadius) {
-            aCurrentVelocity = reflect(aCurrentVelocity, planeNormal);
+        bool currentCollidingState = abs(projMag) < aRadius;
+        
+        if (!aCollidingStates[i] && currentCollidingState) {
+            vec3 planeVelocity = aCollidingPlanes[i]->GetVelocity();
+
+            // if (planeVelocity == vec3(0.f))
+                // aCurrentVelocity = reflect(aCurrentVelocity, planeNormal)*0.9f;
+            // else
+            aCurrentVelocity = reflect(aCurrentVelocity, planeNormal) + planeVelocity*0.9f;
+            
         }
+        
+        aCollidingStates[i] = currentCollidingState;
     }
 }
 
