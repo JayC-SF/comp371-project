@@ -9,6 +9,7 @@
 #include <fstream> // std::ifstream
 #include <sstream> // std::stringstream, std::stringbuf
 
+#include "objects/include.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
@@ -48,6 +49,7 @@ vec3 MY_DOWN(0.0f, -1.0f, 0.0f);
 vec3 MY_FORWARD(0.0f, 0.0f, -1.0f);
 vec3 MY_BACKWARD(0.0f, 0.0f, 1.0f);
 
+TennisBall tennisBall;
 
 GLuint loadTexture(const char *filename)
 {
@@ -960,6 +962,9 @@ void drawScene(int shaderProgram, mat4 fullModelMatrices_SRT[])
     glBindTexture(GL_TEXTURE_2D, ballID);
     setColorUniform(shaderProgram, colorLightBlue);
     glDrawElements(GL_TRIANGLES, vertexCount ,GL_UNSIGNED_INT,(void*)0);
+
+    tennisBall.Draw(shaderProgram, glGetUniformLocation(shaderProgram, "modelMatrix"));
+    
 }
 
 int main(int argc, char *argv[])
@@ -1135,6 +1140,9 @@ int main(int argc, char *argv[])
     vec3 rABCameraPosition = vec3(0.0f, 7, -15.0f);
     vec3 rIBCameraPosition = vec3(0.0f, 7, 15.0f);
 
+    tennisBall = TennisBall(0.5f, vec3(0.f, 0.f, 0.f), vec3(0.f, 15.f, 0.f), vec3(0.f, -10.f, 0.f));
+    Plane groundPlane(100, 100, MY_UP, vec3(0.f));
+    tennisBall.AddCollidingPlane(&groundPlane);
     // Entering Main Loop
     while (!glfwWindowShouldClose(window))
     {
@@ -1187,7 +1195,7 @@ int main(int argc, char *argv[])
 
         drawScene(shaderProgram, fullModelMatrices_SRT);
 
-
+        tennisBall.UpdatePhysics(dt);
         //                             ************* RENDER THE BOX outside the passes ************* 
         // change the VAO to the box VAO with reveresed surfaces
         setMaterial(shaderProgram, vec3(1.0f, 1.0, 1.0f), vec3(1.0f), vec3(0.2f, 0.2, 0.2f), 1);

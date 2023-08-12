@@ -26,7 +26,18 @@ set(ASSETS assets)
 
 file(GLOB SRC src/*.cpp)
 
-add_executable(${EXEC} ${SRC})
+
+# Function to add all files from a directory and its subdirectories
+function(add_source_files_recursive SOURCE_DIR)
+    file(GLOB_RECURSE SOURCE_FILES "${SOURCE_DIR}/*.cpp")
+    list(APPEND ALL_SOURCE_FILES ${SOURCE_FILES})
+    set(ALL_SOURCE_FILES ${ALL_SOURCE_FILES} PARENT_SCOPE)
+endfunction()
+
+# Add source files from src directory and its subdirectories
+add_source_files_recursive(${CMAKE_CURRENT_SOURCE_DIR}/src)
+
+add_executable(${EXEC} ${ALL_SOURCE_FILES})
 
 target_include_directories(${EXEC} PRIVATE include)
 

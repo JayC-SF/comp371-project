@@ -1,6 +1,8 @@
 #include "tennisball.h"
 #include "atoms/sphere.h"
 #include "../texture.h"
+#include <cstdio>
+#include <iostream>
 
 TennisBall::TennisBall() :
 aModelMatrix(mat4(1.f)), 
@@ -70,9 +72,9 @@ void TennisBall::Update() {
 
 void TennisBall::UpdatePhysics(GLfloat dt) {
     // calculate position
+    aCurrentVelocity += aCurrentAcceleration*dt;
     aCurrentPosition += aCurrentVelocity*dt;
     // calculate velocity
-    aCurrentVelocity += aCurrentAcceleration*dt;
     CheckCollisions();
     aIsUpdated = false;
 }
@@ -91,7 +93,9 @@ void TennisBall::CheckCollisions() {
         GLfloat projMag = dot(planeToSphereCenter, planeNormal);
         
         if (projMag <= aRadius) {
+            double length = aCurrentVelocity.x*aCurrentVelocity.x + aCurrentVelocity.y*aCurrentVelocity.y + aCurrentVelocity.z*aCurrentVelocity.z;
             aCurrentVelocity = reflect(aCurrentVelocity, planeNormal);
+            double length1 = aCurrentVelocity.x*aCurrentVelocity.x + aCurrentVelocity.y*aCurrentVelocity.y + aCurrentVelocity.z*aCurrentVelocity.z;
             // aCurrentVelocity.y = -aCurrentVelocity.y;
         }
     }
