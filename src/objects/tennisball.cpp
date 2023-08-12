@@ -72,8 +72,8 @@ void TennisBall::Update() {
 
 void TennisBall::UpdatePhysics(GLfloat dt) {
     // calculate position
+    aCurrentPosition += aCurrentVelocity*dt + aCurrentAcceleration*dt*dt/2.f ;
     aCurrentVelocity += aCurrentAcceleration*dt;
-    aCurrentPosition += aCurrentVelocity*dt;
     // calculate velocity
     CheckCollisions();
     aIsUpdated = false;
