@@ -1,3 +1,5 @@
+#ifndef SCOREBOARD_HPP
+#define SCOREBOARD_HPP
 class Scoreboard
 {
 public:
@@ -58,7 +60,7 @@ public:
         transform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -2.5f));
         drawNumber(shaderProgram, player2Score / 10, modelMatrix * transform);
 
-        // TODO render time above scoreboard
+        // render time above scoreboard
         glUniform3fv(glGetUniformLocation(shaderProgram, "myColor"), 1, &timeColor[0]); // set color
         transform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 4.0f, 0.0f));
         transform = glm::scale(transform, glm::vec3(1.0f, 0.4f, 0.4f));
@@ -207,3 +209,4 @@ public:
         glfwSetTime(0.0f);
     }
 };
+#endif
