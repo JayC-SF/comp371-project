@@ -883,30 +883,6 @@ void drawScene(int shaderProgram, mat4 elbow [], mat4 wrist[])
         glUniformMatrix4fv(racketHandle_modelMatrixLocation, 1, GL_FALSE, &racketHandle_modelMatrix[0][0]);
         glDrawArrays(currentRenderMode, 0, 36);
 
-        // ******************* two centres of the racket planes **********************
-        // ***************************************************************************
-        
-        mat4 aCentre = racketHandle_groupMatrix * translate(IDENTITY_MATRIX, vec3(0.0f, 3.05f, 0.0f)) * scale(IDENTITY_MATRIX, vec3(0.1f, 4.f, 2.5f)) * initialCubeTranslate;
-        GLuint centreLocation = glGetUniformLocation(shaderProgram, "modelMatrix");
-        glUniformMatrix4fv(centreLocation, 1, GL_FALSE, &aCentre[0][0]);
-        glDrawArrays(currentRenderMode, 0, 36);
-
-        // look good for a now
-        centers[i] = vec3(aCentre * vec4(0.f, 0.f, 0.f, 1.f));
-        // std::cout << glm::to_string(centers[i])<< std::endl;
-
-        if (i == 0){
-            normals[i] = normalize(vec3(aCentre * vec4(-1.0f, 0.0f, 0.0f, 0.0f)));
-        }else if (i == 1 ){
-            normals[i] = normalize(vec3(aCentre * vec4(1.0f, 0.0f, 0.0f, 0.0f)));
-        }
-        // std::cout << glm::to_string(normals[i])<< std::endl;
-
-        // ***************************************************************************
-        // ***************************************************************************
-
-        
-
 
 
         //                                 *** RENDER THE RACKET BOTTOM BRACKET ***
@@ -995,6 +971,37 @@ void drawScene(int shaderProgram, mat4 elbow [], mat4 wrist[])
             glUniformMatrix4fv(mesh_modelMatrixLocation, 1, GL_FALSE, &mesh_modelMatrix[0][0]);
             glDrawArrays(currentRenderMode, 0, 36);
         }
+
+         // ******************* two centres of the racket planes **********************
+        // ***************************************************************************
+        mat4 mesh_scaleMatrix = scale(IDENTITY_MATRIX, vec3(0.015f, 1.7f, 1.3f));
+        mat4 mesh_rotationMatrix = rotate(IDENTITY_MATRIX, radians(0.0f), vec3(1.0f, 0.0f, 0.0f));
+        mat4 mesh_translationMatrix = translate(IDENTITY_MATRIX, vec3(0.0f, 2.2, 0.0f));
+        mat4 aCentre= racketHandle_groupMatrix *
+                                    mesh_translationMatrix *
+                                    mesh_rotationMatrix *
+                                    mesh_scaleMatrix *
+                                    initialCubeTranslate;
+        // mat4 aCentre = racketHandle_groupMatrix * translate(IDENTITY_MATRIX, vec3(0.0f, 3.05f, 0.0f)) * scale(IDENTITY_MATRIX, vec3(0.1f, 4.f, 2.5f)) * initialCubeTranslate;
+        GLuint centreLocation = glGetUniformLocation(shaderProgram, "modelMatrix");
+        glUniformMatrix4fv(centreLocation, 1, GL_FALSE, &aCentre[0][0]);
+        glDrawArrays(currentRenderMode, 0, 36);
+
+        // look good for a now
+        centers[i] = vec3(aCentre * vec4(0.f, 0.f, 0.f, 1.f));
+        // std::cout << glm::to_string(centers[i])<< std::endl;
+
+        if (i == 0){
+            normals[i] = normalize(vec3(aCentre * vec4(-1.0f, 0.0f, 0.0f, 0.0f)));
+        }else if (i == 1 ){
+            normals[i] = normalize(vec3(aCentre * vec4(1.0f, 0.0f, 0.0f, 0.0f)));
+        }
+        // std::cout << glm::to_string(normals[i])<< std::endl;
+
+        // ***************************************************************************
+        // ***************************************************************************
+
+        
     }
 
     // ********************************** SHPERE *******************************************
@@ -1208,7 +1215,7 @@ int main(int argc, char *argv[])
     // racket 1 wasd
     Plane racket1Plane(100, 100, normals[0], MY_UP, centers[0], "racket1Plane");
     // racket 2 arrows
-    Plane racket2Plane(4, 4, normals[1], MY_UP, centers[1], "racket2Plane");
+    Plane racket2Plane(1.7, 1.3, normals[1], MY_UP, centers[1], "racket2Plane");
 
     
     tennisBall.AddCollidingPlane(&groundPlane);
