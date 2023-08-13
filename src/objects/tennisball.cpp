@@ -40,7 +40,7 @@ void TennisBall::Draw(GLuint pShaderProgramId, GLuint pModelMatrixLocation) {
     Update();
     Sphere & sphere = Sphere::GetInstance();
     Texture * tennisTexture = Texture::GetTennisBallTexture();
-    // bool isTextured = shader->GetIsTextured();
+    // bool isTextured = pShader->GetIsTextured();
     // shader->SetIsTextured(true);
     glUseProgram(pShaderProgramId);
     sphere.BindAttributes();
@@ -127,8 +127,8 @@ void TennisBall::CheckCollisions() {
             // check if horizontal projection is smaller than half of the width of the plane
             // and check if vertical projection is smaller than half of height of the plane
             currentCollidingState = 
-                (absHorizontalProjMagnitude <= aCollidingPlanes[i]->GetWidth()/2.f) &&
-                (absVerticalProjMagnitude <= aCollidingPlanes[i]->GetHeight()/2.f);
+                (absHorizontalProjMagnitude <= aCollidingPlanes[i]->GetWidth()/2.0f + aRadius) &&
+                (absVerticalProjMagnitude <= aCollidingPlanes[i]->GetHeight()/2.0f + aRadius);
             // check if the sphere has not collided already
             // and check if the point of collision is within the plane
             if (!aCollidingStates[i] && currentCollidingState) {

@@ -134,6 +134,7 @@ void checkCompileErrors(unsigned int shader, std::string type)
         }
     }
 }
+
 int shader(const char *vertexPath, const char *fragmentPath) // doesn't change, just receives the sources
 {
     // 1. retrieve the vertex/fragment source code from filePath
@@ -766,7 +767,7 @@ void drawScene(int shaderProgram, mat4 elbow [], mat4 wrist[])
     // The top part of the net with thicker shape and different color
     mat4 poles_modelMatrix = translate(IDENTITY_MATRIX, vec3(0.0f, 1.5f, 0.0f)) *
                              rotate(IDENTITY_MATRIX, radians(90.0f), vec3(0.0f, 0.0f, 1.0f)) *
-                             scale(IDENTITY_MATRIX, vec3(6.46f, 0.5f, 0.3f));
+                             scale(IDENTITY_MATRIX, vec3(3.0f, 0.5f, 0.3f));
     GLuint poles_modelMatrixLocation = glGetUniformLocation(shaderProgram, "modelMatrix");
     glUniformMatrix4fv(poles_modelMatrixLocation, 1, GL_FALSE, &poles_modelMatrix[0][0]);
     glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -975,17 +976,17 @@ void drawScene(int shaderProgram, mat4 elbow [], mat4 wrist[])
          // ******************* two centres of the racket planes **********************
         // ***************************************************************************
         mat4 mesh_scaleMatrix = scale(IDENTITY_MATRIX, vec3(0.015f, 1.7f, 1.3f));
-        mat4 mesh_rotationMatrix = rotate(IDENTITY_MATRIX, radians(0.0f), vec3(1.0f, 0.0f, 0.0f));
+        // mat4 mesh_rotationMatrix = rotate(IDENTITY_MATRIX, radians(0.0f), vec3(1.0f, 0.0f, 0.0f));
         mat4 mesh_translationMatrix = translate(IDENTITY_MATRIX, vec3(0.0f, 2.2, 0.0f));
         mat4 aCentre= racketHandle_groupMatrix *
                                     mesh_translationMatrix *
-                                    mesh_rotationMatrix *
+                                    // mesh_rotationMatrix *
                                     mesh_scaleMatrix *
                                     initialCubeTranslate;
         // mat4 aCentre = racketHandle_groupMatrix * translate(IDENTITY_MATRIX, vec3(0.0f, 3.05f, 0.0f)) * scale(IDENTITY_MATRIX, vec3(0.1f, 4.f, 2.5f)) * initialCubeTranslate;
         GLuint centreLocation = glGetUniformLocation(shaderProgram, "modelMatrix");
         glUniformMatrix4fv(centreLocation, 1, GL_FALSE, &aCentre[0][0]);
-        glDrawArrays(currentRenderMode, 0, 36);
+        // glDrawArrays(currentRenderMode, 0, 36);
 
         // look good for a now
         centers[i] = vec3(aCentre * vec4(0.f, 0.f, 0.f, 1.f));
@@ -1004,7 +1005,7 @@ void drawScene(int shaderProgram, mat4 elbow [], mat4 wrist[])
         
     }
 
-    // ********************************** SHPERE *******************************************
+    // ********************************** SPHERE *******************************************
     mat4 sphere_scaleMatrix = scale(IDENTITY_MATRIX, vec3(1.0f, 1.0f, 1.0f));
     mat4 sphere_rotationMatrix = rotate(IDENTITY_MATRIX, radians(0.0f), vec3(0.0f, 1.0f, 0.0f));
     mat4 sphere_translationMatrix = translate(IDENTITY_MATRIX, vec3(23.0f, 5.0f, -10.5f));
@@ -1105,7 +1106,7 @@ int main(int argc, char *argv[])
 
     // viewMatrix components
     mat4 viewMatrix(1.0f);
-    vec3 cameraPosition = vec3(40.0f, 20.0f, 0.0f);
+    vec3 cameraPosition = vec3(55.0f, 25.0f, 0.0f);
     vec3 lookAtPoint = vec3(0.0f, 0.0f, 0.0f);
     vec3 upVector = vec3(0.0f, 1.0f, 0.0f);
 
@@ -1202,18 +1203,18 @@ int main(int argc, char *argv[])
     vec3 rABCameraPosition = vec3(0.0f, 7, -15.0f);
     vec3 rIBCameraPosition = vec3(0.0f, 7, 15.0f);
 
-    tennisBall = TennisBall(1.f, vec3(0.f, 8.f, 0.f), vec3(5.f, 6.f, 0.f), vec3(0.f, -10.f, 0.f), 20.f);
+    tennisBall = TennisBall(1.f, vec3(0.f, 8.f, 0.f), vec3(5.0f, 4.f, 0.f), vec3(0.f, -25.f, 0.f), 20.f);
 
     // Plane(GLfloat pWidth, GLfloat pHeight, vec3 pNormal, vec3 pUpTiltVector, vec3 pPosition, const char * pPlaneName)
     Plane groundPlane(100, 100, MY_UP, MY_LEFT, vec3(0.f), "Ground");
-    // Plane netPlane(100, 100, MY_RIGHT, MY_UP, vec3(0.f), "Tennis Net");
+    Plane netPlane(100, 3.0, MY_RIGHT, MY_UP, vec3(0.f), "Tennis Net");
     Plane backCourtPlane(100, 100, MY_LEFT, MY_UP, vec3(37.f, 0.f, 0.f), "backCourt");
     Plane frontCourtPlane(100, 100, MY_RIGHT, MY_UP, vec3(-37.f, 0.f, 0.f), "frontCourtPlane");
     Plane rightCourtPlane(100, 100, MY_FORWARD, MY_UP, vec3(0.f, 0.f, -22.5f), "rightCourtPlane");
     Plane leftCourtPlane(100, 100, MY_BACKWARD, MY_UP, vec3(0.f, 0.f, 22.5f), "leftCourtPlane");
 
     // racket 1 wasd
-    Plane racket1Plane(100, 100, normals[0], MY_UP, centers[0], "racket1Plane");
+    Plane racket1Plane(1.7, 1.3, normals[0], MY_UP, centers[0], "racket1Plane");
     // racket 2 arrows
     Plane racket2Plane(1.7, 1.3, normals[1], MY_UP, centers[1], "racket2Plane");
 
@@ -1221,7 +1222,7 @@ int main(int argc, char *argv[])
     tennisBall.AddCollidingPlane(&groundPlane);
     tennisBall.AddCollidingPlane(&racket1Plane);
     tennisBall.AddCollidingPlane(&racket2Plane);
-    // tennisBall.AddCollidingPlane(&netPlane);
+    tennisBall.AddCollidingPlane(&netPlane);
     tennisBall.AddCollidingPlane(&backCourtPlane);
     tennisBall.AddCollidingPlane(&frontCourtPlane);
     tennisBall.AddCollidingPlane(&rightCourtPlane);
@@ -1268,18 +1269,10 @@ int main(int argc, char *argv[])
         // Each frame, reset color of each pixel to glClearColor specified before
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // __________updating the light position everyframe_______________
-        #pragma region
-        // vec4 lightPosV4 = vec4(lightPos, 1.0f);
-        // // rotation of the light source around axis (1,1,1)
-        // lightPosV4 = (rotate(IDENTITY_MATRIX, radians(lightRotationSpeed * dt), vec3(0.0f, 1.0f, 0.0f)) * lightPosV4);
-        // lightPos = vec3(lightPosV4);
-        // glUniform3fv(lightLocation, 1, &lightPos[0]);
-        // ---------------------------------------------------------------
-        #pragma endregion
-
+        // Render actual models
         drawScene(shaderProgram, elbow, wrist);
 
+        // Update Physics of both rackets and tennis ball
         racket1Plane.UpdatePhysics(centers[0], normals[0], racket1Plane.GetUpTiltVector(),dt);
         racket2Plane.UpdatePhysics(centers[1], normals[1], racket2Plane.GetUpTiltVector(),dt);
         tennisBall.UpdatePhysics(dt);
@@ -1428,7 +1421,7 @@ int main(int argc, char *argv[])
             if(totalElbowRotationbackwards1 > backwardShouler1){
                 rotationMatrixArray[1] = rotate(rotationMatrixArray[1], -radians(0.7f), vec3(0.0f, 0.0f, 1.0f));
                 totalElbowRotationbackwards1 -=  radians(0.7f);
-            }else {
+            } else {
                 if(totalElbowRotation1 > minElbowFlex1 ){
                     elbow[1] = rotate(elbow[1], radians(0.3f), vec3(1.0f, 0.0f, 0.0f)); 
                     totalElbowRotation1 -= radians(0.3f);
