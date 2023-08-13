@@ -80,6 +80,8 @@ GLuint loadTexture(const char *filename)
     glBindTexture(GL_TEXTURE_2D, textureId);
 
     // Step2 Set filter parameters
+    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
@@ -749,6 +751,10 @@ void drawScene(int shaderProgram, mat4 elbow [], mat4 wrist[])
         glUniformMatrix4fv(grid_modelMatrixLocation, 1, GL_FALSE, &grid_modelMatrix[0][0]);
         glDrawArrays(GL_TRIANGLES, 0, 36);
     }
+ 
+    // Cube * cube = Cube::GetInstance();
+    // cube->BindAttributes();
+
     // The top part of the net with thicker shape and different color
     glBindTexture(GL_TEXTURE_2D, fabricID);
     mat4 grid_modelMatrix = translate(IDENTITY_MATRIX, vec3(0.0f, 3.1f, 0.0f)) *
@@ -758,6 +764,8 @@ void drawScene(int shaderProgram, mat4 elbow [], mat4 wrist[])
     glUniformMatrix4fv(grid_modelMatrixLocation, 1, GL_FALSE, &grid_modelMatrix[0][0]);
     colorLocation = glGetUniformLocation(shaderProgram, "myColor");
     glUniform3fv(colorLocation, 1, &colorWhite[0]);
+    // cube->SetRepeatUVCoord(vec3(0.08f, 0.5f, 36.0f));
+    // cube->Draw();
     glDrawArrays(GL_TRIANGLES, 0, 36);
 
     // the poles to hold the net
@@ -771,6 +779,12 @@ void drawScene(int shaderProgram, mat4 elbow [], mat4 wrist[])
     GLuint poles_modelMatrixLocation = glGetUniformLocation(shaderProgram, "modelMatrix");
     glUniformMatrix4fv(poles_modelMatrixLocation, 1, GL_FALSE, &poles_modelMatrix[0][0]);
     glDrawArrays(GL_TRIANGLES, 0, 36);
+
+    // cube->SetRepeatUVCoord(vec3(3.0f, 0.5f, 0.3f));
+    // cube->Draw();
+    // cube->UnbindAttributes();
+    // glBindVertexArray(baseCube_VAO);
+
     // right pole
     glUniformMatrix4fv(poles_modelMatrixLocation, 1, GL_FALSE, &(translate(IDENTITY_MATRIX, vec3(0.0f, 0.0f, 17.8f)) * poles_modelMatrix)[0][0]);
     glDrawArrays(GL_TRIANGLES, 0, 36);

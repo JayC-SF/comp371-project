@@ -4,6 +4,8 @@ project(fProject)
 
 include(ExternalProject)
 
+set(CMAKE_CXX_STANDARD 11) #optional to use c++11
+
 # Set install directory
 set(CMAKE_INSTALL_PREFIX ${CMAKE_SOURCE_DIR}/dist CACHE PATH ${CMAKE_SOURCE_DIR}/dist FORCE)
 set(CMAKE_BUILD_TYPE "Debug")
