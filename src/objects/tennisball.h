@@ -11,7 +11,7 @@ class TennisBall {
     public:
     TennisBall();
     TennisBall(GLfloat pRadius);
-    TennisBall(GLfloat pRadius, vec3 initPosition, vec3 initVelocity, vec3 initAcceleration, GLfloat pMaxVelocity);
+    TennisBall(GLfloat pRadius, vec3 initPosition, vec3 initVelocity, vec3 initAcceleration, GLfloat pMaxSpeed);
 
     void Draw(GLuint pShaderProgramId, GLuint pModelMatrixLocation);
     void Translate(vec3 pTranslate);

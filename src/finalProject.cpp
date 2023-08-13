@@ -763,7 +763,7 @@ void drawScene(int shaderProgram, mat4 elbow [], mat4 wrist[])
     // The top part of the net with thicker shape and different color
     mat4 poles_modelMatrix = translate(mat4(1.0f), vec3(0.0f, 1.5f, 0.0f)) *
                              rotate(mat4(1.0f), radians(90.0f), vec3(0.0f, 0.0f, 1.0f)) *
-                             scale(mat4(1.0f), vec3(3.0f, 0.5f, 0.3f));
+                             scale(mat4(1.0f), vec3(6.46f, 0.5f, 0.3f));
     GLuint poles_modelMatrixLocation = glGetUniformLocation(shaderProgram, "modelMatrix");
     glUniformMatrix4fv(poles_modelMatrixLocation, 1, GL_FALSE, &poles_modelMatrix[0][0]);
     glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -883,13 +883,13 @@ void drawScene(int shaderProgram, mat4 elbow [], mat4 wrist[])
         // ******************* two centres of the racket planes **********************
         // ***************************************************************************
         
-        mat4 aCentre = racketHandle_groupMatrix * translate(mat4(1.0f), vec3(0.0f, 3.05f, 0.0f));
+        mat4 aCentre = racketHandle_groupMatrix * translate(mat4(1.0f), vec3(0.0f, 3.05f, 0.0f)) * scale(mat4(1.f), vec3(0.3f, 4.f, 4.f)) * initialCubeTranslate;
         GLuint centreLocation = glGetUniformLocation(shaderProgram, "modelMatrix");
         glUniformMatrix4fv(centreLocation, 1, GL_FALSE, &aCentre[0][0]);
-        // glDrawArrays(currentRenderMode, 0, 36);
+        glDrawArrays(currentRenderMode, 0, 36);
 
         // look good for a now
-        centers[i] = vec3(aCentre * vec4(1.0f));
+        centers[i] = vec3(aCentre * vec4(0.f, 0.f, 0.f, 1.f));
         // std::cout << glm::to_string(centers[i])<< std::endl;
 
         if (i == 0){
@@ -1192,23 +1192,26 @@ int main(int argc, char *argv[])
     vec3 rABCameraPosition = vec3(0.0f, 7, -15.0f);
     vec3 rIBCameraPosition = vec3(0.0f, 7, 15.0f);
 
-    tennisBall = TennisBall(.3f, vec3(0.f, 8.f, 0.f), vec3(5.f, 7.f, 0.f), vec3(0.f, -10.f, 0.f), 20.f);
+    tennisBall = TennisBall(1.f, vec3(0.f, 8.f, 0.f), vec3(5.f, 6.f, 0.f), vec3(0.f, -10.f, 0.f), 20.f);
 
-    Plane groundPlane(100, 100, MY_UP, vec3(0.f));
-    Plane netPlane(100, 100, MY_RIGHT, vec3(0.f));
-    Plane backCourtPlane(100, 100, MY_LEFT, vec3(37.f, 0.f, 0.f));
-    Plane frontCourtPlane(100, 100, MY_RIGHT, vec3(-37.f, 0.f, 0.f));
-    Plane rightCourtPlane(100, 100, MY_FORWARD, vec3(0.f, 0.f, -22.5f));
-    Plane leftCourtPlane(100, 100, MY_BACKWARD, vec3(0.f, 0.f, 22.5f));
+    // Plane(GLfloat pWidth, GLfloat pHeight, vec3 pNormal, vec3 pUpTiltVector, vec3 pPosition, const char * pPlaneName)
+    Plane groundPlane(100, 100, MY_UP, MY_LEFT, vec3(0.f), "Ground");
+    // Plane netPlane(100, 100, MY_RIGHT, MY_UP, vec3(0.f), "");
+    Plane backCourtPlane(100, 100, MY_LEFT, MY_UP, vec3(37.f, 0.f, 0.f), "backCourt");
+    Plane frontCourtPlane(100, 100, MY_RIGHT, MY_UP, vec3(-37.f, 0.f, 0.f), "frontCourtPlane");
+    Plane rightCourtPlane(100, 100, MY_FORWARD, MY_UP, vec3(0.f, 0.f, -22.5f), "rightCourtPlane");
+    Plane leftCourtPlane(100, 100, MY_BACKWARD, MY_UP, vec3(0.f, 0.f, 22.5f), "leftCourtPlane");
 
-    Plane racket1Plane(1.3, 1.7, normals[0], centers[0]);
-    Plane racket2Plane(1.3, 1.7, normals[1], centers[1]);
+    // racket 1 wasd
+    Plane racket1Plane(100, 100, normals[0], MY_UP, centers[0], "racket1Plane");
+    // racket 2 arrows
+    Plane racket2Plane(4, 4, normals[1], MY_UP, centers[1], "racket2Plane");
 
     
     tennisBall.AddCollidingPlane(&groundPlane);
     tennisBall.AddCollidingPlane(&racket1Plane);
     tennisBall.AddCollidingPlane(&racket2Plane);
-    tennisBall.AddCollidingPlane(&netPlane);
+    // tennisBall.AddCollidingPlane(&netPlane);
     tennisBall.AddCollidingPlane(&backCourtPlane);
     tennisBall.AddCollidingPlane(&frontCourtPlane);
     tennisBall.AddCollidingPlane(&rightCourtPlane);
@@ -1267,8 +1270,8 @@ int main(int argc, char *argv[])
 
         drawScene(shaderProgram, elbow, wrist);
 
-        racket1Plane.UpdatePhysics(centers[0], normals[0], dt);
-        racket2Plane.UpdatePhysics(centers[1], normals[1], dt);
+        racket1Plane.UpdatePhysics(centers[0], normals[0], racket1Plane.GetUpTiltVector(),dt);
+        racket2Plane.UpdatePhysics(centers[1], normals[1], racket2Plane.GetUpTiltVector(),dt);
         tennisBall.UpdatePhysics(dt);
 
 

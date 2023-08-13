@@ -1,6 +1,7 @@
 #include "tennisball.h"
 #include "atoms/sphere.h"
 #include "../texture.h"
+#include "glm/common.hpp"
 #include "glm/geometric.hpp"
 #include <cstdio>
 #include <iostream>
@@ -23,7 +24,7 @@ aIsUpdated(false),
 aMaxSpeed(1.f)
 {}
 
-TennisBall::TennisBall(GLfloat pRadius, vec3 initPosition, vec3 initVelocity, vec3 initAcceleration, GLfloat pMaxVelocity):
+TennisBall::TennisBall(GLfloat pRadius, vec3 initPosition, vec3 initVelocity, vec3 initAcceleration, GLfloat pMaxSpeed):
 aModelMatrix(mat4(1.f)), 
 aScale(scale(mat4(1.f), vec3(pRadius))), 
 aRotation(mat4(1.f)), 
@@ -32,7 +33,7 @@ aIsUpdated(false){
     SetAcceleration(initAcceleration);
     SetPosition(initPosition);
     SetVelocity(initVelocity);
-    aMaxSpeed = pMaxVelocity;
+    aMaxSpeed = pMaxSpeed;
 }
 
 void TennisBall::Draw(GLuint pShaderProgramId, GLuint pModelMatrixLocation) {
@@ -100,7 +101,10 @@ void TennisBall::AddCollidingPlane(Plane * pPlane) {
     aCollidingPlanes.push_back(pPlane);
     aCollidingStates.push_back(false);
 }
+void printVector(vec3 v) {
+    cout << v.x << " " << v.y << " " << v.z << endl;
 
+}
 void TennisBall::CheckCollisions() {
     for (int i = 0; i<aCollidingPlanes.size(); i++) {
         // check if we have a collision
@@ -111,17 +115,45 @@ void TennisBall::CheckCollisions() {
         GLfloat projMag = dot(planeToSphereCenter, planeNormal);
         
         bool currentCollidingState = abs(projMag) < aRadius;
-        
-        if (!aCollidingStates[i] && currentCollidingState) {
-            vec3 planeVelocity = aCollidingPlanes[i]->GetVelocity();
+        // check if projection magnitude is less than the radius length
+        // if so check if point is inside the plane.
+        if (currentCollidingState) {
+            vec3 pointOfIncidence = -projMag * planeNormal + aCurrentPosition;
+            vec3 incidenceVector = pointOfIncidence - planePoint;
 
-            // if (planeVelocity == vec3(0.f))
-                // aCurrentVelocity = reflect(aCurrentVelocity, planeNormal)*0.9f;
-            // else
-            aCurrentVelocity = reflect(aCurrentVelocity, planeNormal) + planeVelocity;
-            
+            GLfloat absHorizontalProjMagnitude = abs((dot(incidenceVector, aCollidingPlanes[i]->GetRightVector())));
+            GLfloat absVerticalProjMagnitude = abs(dot(incidenceVector, aCollidingPlanes[i]->GetUpVector()));
+            // check if horizontal projection is smaller than half of the width of the plane
+            // and check if vertical projection is smaller than half of height of the plane
+            currentCollidingState = 
+                (absHorizontalProjMagnitude <= aCollidingPlanes[i]->GetWidth()/2.f) &&
+                (absVerticalProjMagnitude <= aCollidingPlanes[i]->GetHeight()/2.f);
+            // check if the sphere has not collided already
+            // and check if the point of collision is within the plane
+            if (!aCollidingStates[i] && currentCollidingState) {
+                vec3 planeVelocity = aCollidingPlanes[i]->GetVelocity();
+                
+                cout << "ball position" << endl;
+                printVector(aCurrentPosition);
+                cout << aCollidingPlanes[i]->GetPlaneName() << " collision " << endl;
+                printVector(pointOfIncidence);
+                cout << aCollidingPlanes[i]->GetPlaneName() << " pointCenter " << endl;
+                printVector(planePoint);
+                cout << aCollidingPlanes[i]->GetPlaneName() << " normal " << endl;
+                printVector(planeNormal);
+                cout << aCollidingPlanes[i]->GetPlaneName() << " right " << endl;
+                printVector(aCollidingPlanes[i]->GetRightVector());
+                cout << aCollidingPlanes[i]->GetPlaneName() << " up " << endl;
+                printVector(aCollidingPlanes[i]->GetUpVector());
+                cout << aCollidingPlanes[i]->GetPlaneName() << " uptilt " << endl;
+                printVector(aCollidingPlanes[i]->GetUpTiltVector());
+                
+                // cout << "currentVelocity before" << aCurrentVelocity.x << " " << aCurrentVelocity.y << " " << aCurrentVelocity.z << endl;
+                aCurrentVelocity = reflect(aCurrentVelocity, planeNormal) + planeVelocity;
+                // cout << "currentVelocity after " << aCurrentVelocity.x << " " << aCurrentVelocity.y << " " << aCurrentVelocity.z << endl;
+
+            }
         }
-        
         aCollidingStates[i] = currentCollidingState;
     }
 }
