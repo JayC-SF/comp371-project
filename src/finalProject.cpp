@@ -1,9 +1,13 @@
-#define GLEW_STATIC 1 // This allows linking with Static Library on Windows, without DLL
+// MASSIMO MANGIOLA
+// 40235157
+// COMP 351 - QUIZ 2
+
+#define GLEW_STATIC 1
 #include <iostream>
-#include <GL/glew.h>                    // Include GLEW - OpenGL Extension Wrangler
-#include <GLFW/glfw3.h>                 // GLFW provides a cross-platform interface for creating a graphical context initializing OpenGL and binding inputs
-#include <glm/glm.hpp>                  // GLM is an optimized math library with syntax to similar to OpenGL Shading Language
-#include <glm/gtc/matrix_transform.hpp> // include this to create transformation matrices
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 #include <glm/common.hpp>
 #include <random>
 #include <fstream> // std::ifstream
@@ -497,7 +501,7 @@ void setShadowMap(int shaderProgram, int value)
 
 // ************************* GLOBALIZATION FOR THE DRAWSCENE FUNCTION PARAMETERS ***************************
 // load textures
-GLuint brickID, skyID, cementID, glossyID, woodID, fabricID, metalID, tennisID, ballID;
+GLuint brickID, skyID, cementID, glossyID, woodID, fabricID, metalID, tennisID, ballID, grassID, wallID, ad1ID, ad2ID, ad3ID, ad4ID, borderID;
 
 // *** Creating the VAOs ***
 
@@ -708,8 +712,8 @@ void drawScene(int shaderProgram, mat4 elbow[], mat4 wrist[])
     GLuint initialCubeTranslateLocation = glGetUniformLocation(shaderProgram, "modelMatrix");
     glUniformMatrix4fv(initialCubeTranslateLocation, 1, GL_FALSE, &initialCubeTranslate[0][0]);
 
-//              ************************** START OF RENDERING **************************
-//                             ************* RENDER THE COURSE NET *************
+    //              ************************** START OF RENDERING **************************
+    //                             ************* RENDER THE COURSE NET *************
 #pragma region
     setMaterial(shaderProgram, vec3(1.0), vec3(1.0), vec3(0.4, 0.4, 0.4), 1.f);
     glBindTexture(GL_TEXTURE_2D, brickID);
@@ -760,7 +764,7 @@ void drawScene(int shaderProgram, mat4 elbow[], mat4 wrist[])
     glDrawArrays(GL_TRIANGLES, 0, 36);
 #pragma endregion
 
-//                             ************* RENDER THE FLOOR *************
+    //                             ************* RENDER THE FLOOR *************
 #pragma region
     glBindTexture(GL_TEXTURE_2D, tennisID);
     grid_modelMatrix = translate(mat4(1.0f), vec3(0.0f, -0.3f, 0.0f)) *
@@ -773,6 +777,15 @@ void drawScene(int shaderProgram, mat4 elbow[], mat4 wrist[])
     glDrawArrays(GL_TRIANGLES, 0, 36);
     colorLocation = glGetUniformLocation(shaderProgram, "myColor");
     glUniform3fv(colorLocation, 1, &colorBlack[0]);
+
+    // Render grass
+    colorLocation = glGetUniformLocation(shaderProgram, "myColor");
+    glUniform3fv(colorLocation, 1, &colorWhite[0]);
+    glBindTexture(GL_TEXTURE_2D, grassID);
+    mat4 floor_matrix = translate(mat4(1.0f), vec3(0.0f, -0.5f, 0.0f)) *
+                        scale(mat4(1.0f), vec3(100.0f, 0.5f, 100.0f));
+    glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "modelMatrix"), 1, GL_FALSE, &floor_matrix[0][0]);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
 
     // the rest of the net
     for (int i = 0; i < 73; i++)
@@ -787,6 +800,77 @@ void drawScene(int shaderProgram, mat4 elbow[], mat4 wrist[])
     }
     glBindTexture(GL_TEXTURE_2D, brickID);
 #pragma endregion
+
+    // ---- Render audience stands ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
+    glBindTexture(GL_TEXTURE_2D, wallID);
+    colorLocation = glGetUniformLocation(shaderProgram, "myColor");
+    glUniform3fv(colorLocation, 1, &colorWhite[0]);
+
+    // Dark walls
+    mat4 audience = translate(mat4(1.0f), vec3(0.0f, 2.0f, 30.0f)) * scale(mat4(1.0f), vec3(100.0f, 6.0f, 1.0f));
+    glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "modelMatrix"), 1, GL_FALSE, &audience[0][0]);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+    audience = translate(mat4(1.0f), vec3(0.0f, 2.0f, -30.0f)) * scale(mat4(1.0f), vec3(100.0f, 6.0f, 1.0f));
+    glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "modelMatrix"), 1, GL_FALSE, &audience[0][0]);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+    audience = translate(mat4(1.0f), vec3(-50.0f, 2.0f, 0.0f)) * scale(mat4(1.0f), vec3(1.0f, 6.0f, 60.0f));
+    glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "modelMatrix"), 1, GL_FALSE, &audience[0][0]);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+
+    // Light borders
+    glBindTexture(GL_TEXTURE_2D, borderID);
+    glUniform3fv(colorLocation, 1, &colorWhite[0]);
+
+    audience = translate(mat4(1.0f), vec3(0.0f, 5.0f, 30.0f)) * scale(mat4(1.0f), vec3(100.0f, 1.0f, 1.0f));
+    glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "modelMatrix"), 1, GL_FALSE, &audience[0][0]);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+    audience = translate(mat4(1.0f), vec3(0.0f, 5.0f, -30.0f)) * scale(mat4(1.0f), vec3(100.0f, 1.0f, 1.0f));
+    glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "modelMatrix"), 1, GL_FALSE, &audience[0][0]);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+    audience = translate(mat4(1.0f), vec3(-50.0f, 5.0f, 0.0f)) * scale(mat4(1.0f), vec3(1.0f, 1.0f, 60.0f));
+    glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "modelMatrix"), 1, GL_FALSE, &audience[0][0]);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+
+    glUniform3fv(colorLocation, 1, &colorWhite[0]);
+    // Advertisements
+    glBindTexture(GL_TEXTURE_2D, ad1ID);
+    audience = translate(mat4(1.0f), vec3(0.0f, 2.5f, 29.5f)) * scale(mat4(1.0f), vec3(10.0f, 4.0f, 0.1f));
+    glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "modelMatrix"), 1, GL_FALSE, &audience[0][0]);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+    glBindTexture(GL_TEXTURE_2D, ad2ID);
+    audience = translate(mat4(1.0f), vec3(-14.0f, 2.5f, 29.5f)) * scale(mat4(1.0f), vec3(10.0f, 4.0f, 0.1f));
+    glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "modelMatrix"), 1, GL_FALSE, &audience[0][0]);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+    glBindTexture(GL_TEXTURE_2D, ad1ID);
+    audience = translate(mat4(1.0f), vec3(-28.0f, 2.5f, 29.5f)) * scale(mat4(1.0f), vec3(10.0f, 4.0f, 0.1f));
+    glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "modelMatrix"), 1, GL_FALSE, &audience[0][0]);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+    glBindTexture(GL_TEXTURE_2D, ad2ID);
+    audience = translate(mat4(1.0f), vec3(-42.0f, 2.5f, 29.5f)) * scale(mat4(1.0f), vec3(10.0f, 4.0f, 0.1f));
+    glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "modelMatrix"), 1, GL_FALSE, &audience[0][0]);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+
+    glBindTexture(GL_TEXTURE_2D, ad3ID);
+    audience = translate(mat4(1.0f), vec3(0.0f, 2.5f, -29.5f)) * scale(mat4(1.0f), vec3(10.0f, 4.0f, 0.1f));
+    glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "modelMatrix"), 1, GL_FALSE, &audience[0][0]);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+    glBindTexture(GL_TEXTURE_2D, ad2ID);
+    audience = translate(mat4(1.0f), vec3(-14.0f, 2.5f, -29.5f)) * scale(mat4(1.0f), vec3(10.0f, 4.0f, 0.1f));
+    glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "modelMatrix"), 1, GL_FALSE, &audience[0][0]);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+    glBindTexture(GL_TEXTURE_2D, ad3ID);
+    audience = translate(mat4(1.0f), vec3(-28.0f, 2.5f, -29.5f)) * scale(mat4(1.0f), vec3(10.0f, 4.0f, 0.1f));
+    glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "modelMatrix"), 1, GL_FALSE, &audience[0][0]);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+    glBindTexture(GL_TEXTURE_2D, ad2ID);
+    audience = translate(mat4(1.0f), vec3(-42.0f, 2.5f, -29.5f)) * scale(mat4(1.0f), vec3(10.0f, 4.0f, 0.1f));
+    glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "modelMatrix"), 1, GL_FALSE, &audience[0][0]);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+
+    glBindTexture(GL_TEXTURE_2D, ad4ID);
+    audience = translate(mat4(1.0f), vec3(-49.0f, 2.5f, 0.0f)) * scale(mat4(1.0f), vec3(0.1f, 4.0f, 40.0f));
+    glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "modelMatrix"), 1, GL_FALSE, &audience[0][0]);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
 
     //                                     **************** RENDER THE TWO MODELS ****************
 
@@ -810,8 +894,8 @@ void drawScene(int shaderProgram, mat4 elbow[], mat4 wrist[])
         setColorUniform(shaderProgram, colorSkin);
         glDrawArrays(currentRenderMode, 0, 36);
 
-//                                    **************** RENDER THE LOWER ARM ****************
-// Elbow group matrix that contains the shoulder group matrix
+        //                                    **************** RENDER THE LOWER ARM ****************
+        // Elbow group matrix that contains the shoulder group matrix
 #pragma region
         // group matrix 2
         mat4 elbow_groupMatrix = shoulder_groupMatrix * lowerArm_translationMatrix * elbow[i] * lowerArm_rotationMatrix;
@@ -1012,9 +1096,9 @@ void drawSkyCube(int shaderProgram)
     setColorUniform(shaderProgram, colorBeige);
 
     // MVP matrices to create the model matrix of the BOX
-    mat4 BOX_scaleMatrix = scale(mat4(1.0f), vec3(87.0f, 30.0f, 45.0f));
+    mat4 BOX_scaleMatrix = scale(mat4(1.0f), vec3(100.0f, 30.0f, 100.0f));
     mat4 BOX_rotationMatrix = rotate(mat4(1.0f), radians(0.0f), vec3(1.0f, 0.0f, 0.0f));
-    mat4 BOX_translationMatrix = translate(mat4(1.0f), vec3(0.0f, -0.3, 0.0f));
+    mat4 BOX_translationMatrix = translate(mat4(1.0f), vec3(0.0f, -1.0f, 0.0f));
     mat4 BOX_modelMatrix = BOX_translationMatrix *
                            BOX_rotationMatrix *
                            BOX_scaleMatrix *
@@ -1126,6 +1210,13 @@ int main(int argc, char *argv[])
     metalID = loadTexture("../assets/textures/metal.jpg");
     tennisID = loadTexture("../assets/textures/court1.jpg");
     ballID = loadTexture("../assets/textures/tennis2.jpg");
+    grassID = loadTexture("../assets/textures/grass.png");
+    wallID = loadTexture("../assets/textures/wall.png");
+    ad1ID = loadTexture("../assets/textures/ad1.png");
+    ad2ID = loadTexture("../assets/textures/ad2.png");
+    ad3ID = loadTexture("../assets/textures/ad3.png");
+    ad4ID = loadTexture("../assets/textures/ad4.png");
+    borderID = loadTexture("../assets/textures/border.png");
 
     // SET THE LIGHT COMPONENTS TO STARTING VALUES
     vec3 setAmbient = vec3(1.0, 1.0, 1.0);
@@ -1211,7 +1302,7 @@ int main(int argc, char *argv[])
         // Each frame, reset color of each pixel to glClearColor specified before
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-// __________updating the light position everyframe_______________
+        // __________updating the light position everyframe_______________
 #pragma region
 // vec4 lightPosV4 = vec4(lightPos, 1.0f);
 // // rotation of the light source around axis (1,1,1)
