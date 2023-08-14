@@ -129,11 +129,11 @@ Cube::Cube() : Atom(){
 
     // init and bind uv vbo
     aVBOUV.Init(UV.size()*sizeof(vec2), &UV[0][0], GL_STATIC_DRAW);
-    aVAO.VAttribPointer(aVBOUV, 1, 2, GL_FLOAT, sizeof(vec2), NULL);
+    aVAO.VAttribPointer(aVBOUV, 3, 2, GL_FLOAT, sizeof(vec2), NULL);
 
     // init and bind normal vbo
     aVBONormals.Init(normals.size()*sizeof(vec3), &normals[0][0], GL_STATIC_DRAW);
-    aVAO.VAttribPointer(aVBOVertex, 2, 3, GL_FLOAT, sizeof(vec3), NULL);
+    aVAO.VAttribPointer(aVBONormals, 2, 3, GL_FLOAT, sizeof(vec3), NULL);
     
     // default EBO.
     aEBO.Init(cubePointAndTriangleIndices.size(), &cubePointAndTriangleIndices[0], GL_STATIC_DRAW, GL_TRIANGLES);
