@@ -1071,7 +1071,7 @@ int main(int argc, char *argv[])
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
     // Create Window and rendering context using GLFW, resolution is 800x600
-    GLFWwindow *window = glfwCreateWindow(1024, 768, "Comp371 - project", NULL, NULL);
+    GLFWwindow *window = glfwCreateWindow(1024, 768, "Comp371 - Tennis Game Project", NULL, NULL);
     if (window == NULL)
     {
         std::cerr << "Failed to create GLFW window" << std::endl;
