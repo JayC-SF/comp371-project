@@ -117,7 +117,7 @@ Sphere::Sphere() : Atom(){
     aVAO.VAttribPointer(aVBOVertex, 0, 3, GL_FLOAT, sizeof(vec3), 0);
     
     aVBOUV.Init(UV.size()*sizeof(vec2), &UV[0][0], GL_STATIC_DRAW);
-    aVAO.VAttribPointer(aVBOUV, 1, 2, GL_FLOAT, sizeof(vec2), 0);
+    aVAO.VAttribPointer(aVBOUV, 3, 2, GL_FLOAT, sizeof(vec2), 0);
 
     // set the vbo for the normals which is simply 
     aVBONormals.Init(vertices.size()*sizeof(vec3), &vertices[0][0], GL_STATIC_DRAW);
