@@ -13,6 +13,9 @@ class Texture {
     static Texture * GetCementTexture();
     static Texture * GetTattooTexture();
     static Texture * GetSkyTexture();
+    static Texture * GetGrassTexture();
+    static Texture * GetWallTexture();
+    static Texture * GetTennisCourtTexture();
 
     Texture();
     Texture(const char * pFileLocation);

@@ -72,7 +72,7 @@ Texture * Texture::GetTennisBallTexture() {
 }
 
 Texture * Texture::GetArmTexture() {
-    static Texture instance("../assets/textures/arm.jpeg");
+    static Texture instance("../assets/textures/skin.jpg");
     return &instance;
 }
 
@@ -103,5 +103,20 @@ Texture * Texture::GetTattooTexture() {
 
 Texture * Texture::GetSkyTexture() {
     static Texture instance("../assets/textures/sky.jpeg");
+    return &instance;
+}
+
+Texture * Texture::GetGrassTexture() {
+    static Texture instance("../assets/textures/grass.png");
+    return &instance;
+}
+
+Texture * Texture::GetWallTexture() {
+    static Texture instance("../assets/textures/wall.png");
+    return &instance;
+}
+
+Texture * Texture::GetTennisCourtTexture() {
+    static Texture instance("../assets/textures/court1.jpg");
     return &instance;
 }

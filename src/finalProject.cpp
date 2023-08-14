@@ -15,10 +15,10 @@
 #include <vector>
 #include "glm/gtx/string_cast.hpp"
 #include "scoreboard.hpp"
-
 #include "objects/include.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
+#include "texture.h"
 // #include "OBJLoader.h"
 
 using namespace glm;
@@ -517,7 +517,7 @@ void setShadowMap(int shaderProgram, int value)
 
 // ************************* GLOBALIZATION FOR THE DRAWSCENE FUNCTION PARAMETERS ***************************
 // load textures
-GLuint brickID,skyID,cementID,glossyID,woodID,fabricID,metalID,tennisID, ballID, skinID, grassID, wallID, ad1ID, ad2ID, ad3ID, ad4ID, borderID;
+GLuint brickID,skyID,cementID,glossyID,woodID,fabricID,metalID, skinID, grassID, wallID, ad1ID, ad2ID, ad3ID, ad4ID, borderID;
 
 
 // *** Creating the VAOs ***
@@ -796,7 +796,7 @@ void drawScene(int shaderProgram, mat4 elbow[], mat4 wrist[])
 //                             ************* RENDER THE FLOOR *************
 
     #pragma region
-    glBindTexture(GL_TEXTURE_2D, tennisID);
+    Texture::GetTennisCourtTexture()->UseTexture();
     grid_modelMatrix = translate(IDENTITY_MATRIX, vec3(0.0f, -0.3f, 0.0f)) *
                        rotate(IDENTITY_MATRIX, radians(0.0f), vec3(0.0f, 1.0f, 0.0f)) *
                        scale(IDENTITY_MATRIX, vec3(FLOOR_WIDTH, 0.5f, FLOOR_HEIGHT));
@@ -811,7 +811,7 @@ void drawScene(int shaderProgram, mat4 elbow[], mat4 wrist[])
     // Render grass
     colorLocation = glGetUniformLocation(shaderProgram, "myColor");
     glUniform3fv(colorLocation, 1, &colorWhite[0]);
-    glBindTexture(GL_TEXTURE_2D, grassID);
+    Texture::GetGrassTexture()->UseTexture();
     mat4 floor_matrix = translate(mat4(1.0f), vec3(0.0f, -0.5f, 0.0f)) *
                         scale(mat4(1.0f), vec3(100.0f, 0.5f, 100.0f));
     glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "modelMatrix"), 1, GL_FALSE, &floor_matrix[0][0]);
@@ -831,7 +831,7 @@ void drawScene(int shaderProgram, mat4 elbow[], mat4 wrist[])
     glBindTexture(GL_TEXTURE_2D, brickID);
 #pragma endregion
     // ---- Render audience stands ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
-    glBindTexture(GL_TEXTURE_2D, wallID);
+    Texture::GetWallTexture()->UseTexture();
     colorLocation = glGetUniformLocation(shaderProgram, "myColor");
     glUniform3fv(colorLocation, 1, &colorWhite[0]);
 
@@ -911,7 +911,7 @@ void drawScene(int shaderProgram, mat4 elbow[], mat4 wrist[])
         fullModel_rotationMatrix = rotationMatrixArray[i];
 
         //                                     **************** RENDER THE UPPER ARM ****************
-        glBindTexture(GL_TEXTURE_2D, skinID);
+        Texture::GetArmTexture()->UseTexture();
         setMaterial(shaderProgram, vec3(1.0), vec3(1.0), vec3(0.2, 0.2, 0.2), 1.f);
         // group matrix number 1
         mat4 shoulder_groupMatrix = fullModel_translationMatrix * fullModel_rotationMatrix * upperArm_translationMatrix * upperArm_rotationMatrix;
@@ -1258,17 +1258,12 @@ int main(int argc, char *argv[])
     woodID = loadTexture("../assets/textures/wood.jpg");
     fabricID = loadTexture("../assets/textures/fabric.jpg");
     metalID = loadTexture("../assets/textures/metal.jpg");
-    tennisID = loadTexture("../assets/textures/court1.jpg");
 
-    ballID = loadTexture("../assets/textures/tennis2.jpg");
-    grassID = loadTexture("../assets/textures/grass.png");
-    wallID = loadTexture("../assets/textures/wall.png");
     ad1ID = loadTexture("../assets/textures/ad1.png");
     ad2ID = loadTexture("../assets/textures/ad2.png");
     ad3ID = loadTexture("../assets/textures/ad3.png");
     ad4ID = loadTexture("../assets/textures/ad4.png");
     borderID = loadTexture("../assets/textures/border.png");
-    skinID = loadTexture("../assets/textures/skin.jpg");
     
 
     // SET THE LIGHT COMPONENTS TO STARTING VALUES
