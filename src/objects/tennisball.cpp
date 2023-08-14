@@ -134,20 +134,20 @@ void TennisBall::CheckCollisions() {
             if (!aCollidingStates[i] && currentCollidingState) {
                 vec3 planeVelocity = aCollidingPlanes[i]->GetVelocity();
                 
-                cout << "ball position:" << endl;
-                printVector(aCurrentPosition);
-                cout << aCollidingPlanes[i]->GetPlaneName() << ": collision " << endl;
-                printVector(pointOfIncidence);
-                cout << aCollidingPlanes[i]->GetPlaneName() << ": pointCenter " << endl;
-                printVector(planePoint);
-                cout << aCollidingPlanes[i]->GetPlaneName() << ": normal " << endl;
-                printVector(planeNormal);
-                cout << aCollidingPlanes[i]->GetPlaneName() << ": right " << endl;
-                printVector(aCollidingPlanes[i]->GetRightVector());
-                cout << aCollidingPlanes[i]->GetPlaneName() << ": up " << endl;
-                printVector(aCollidingPlanes[i]->GetUpVector());
-                cout << aCollidingPlanes[i]->GetPlaneName() << ": uptilt " << endl;
-                printVector(aCollidingPlanes[i]->GetUpTiltVector());
+                // cout << "ball position:" << endl;
+                // printVector(aCurrentPosition);
+                // cout << aCollidingPlanes[i]->GetPlaneName() << ": collision " << endl;
+                // printVector(pointOfIncidence);
+                // cout << aCollidingPlanes[i]->GetPlaneName() << ": pointCenter " << endl;
+                // printVector(planePoint);
+                // cout << aCollidingPlanes[i]->GetPlaneName() << ": normal " << endl;
+                // printVector(planeNormal);
+                // cout << aCollidingPlanes[i]->GetPlaneName() << ": right " << endl;
+                // printVector(aCollidingPlanes[i]->GetRightVector());
+                // cout << aCollidingPlanes[i]->GetPlaneName() << ": up " << endl;
+                // printVector(aCollidingPlanes[i]->GetUpVector());
+                // cout << aCollidingPlanes[i]->GetPlaneName() << ": uptilt " << endl;
+                // printVector(aCollidingPlanes[i]->GetUpTiltVector());
                 
                 // cout << "currentVelocity before" << aCurrentVelocity.x << " " << aCurrentVelocity.y << " " << aCurrentVelocity.z << endl;
                 aCurrentVelocity = reflect(aCurrentVelocity, planeNormal) + planeVelocity;

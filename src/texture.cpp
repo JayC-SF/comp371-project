@@ -25,12 +25,12 @@ void Texture::LoadTexture() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     GLenum format = 0;
-  if (aBitDepth == 1)
-      format = GL_RED;
-  else if (aBitDepth == 3)
-      format = GL_RGB;
-  else if (aBitDepth == 4)
-      format = GL_RGBA;
+    if (aBitDepth == 1)
+        format = GL_RED;
+    else if (aBitDepth == 3)
+        format = GL_RGB;
+    else if (aBitDepth == 4)
+        format = GL_RGBA;
     
     glTexImage2D(GL_TEXTURE_2D, 0, format, aWidth, aHeight, 0, format, GL_UNSIGNED_BYTE, textData);
     glGenerateMipmap(GL_TEXTURE_2D);
@@ -50,7 +50,6 @@ void Texture::ClearTexture() {
 }
 
 void Texture::UseTexture() {
-    // glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, aTextureID);
 }
 
