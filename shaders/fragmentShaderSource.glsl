@@ -74,6 +74,9 @@
    // conditional definition of the fragment color
    if (useTexture == 1)
    {
+       if(textureColor.a < 0.1){
+         discard;
+       }
        ambientColor = vec3(textureColor) * vertexColor * ambientFactor;
        diffuseColor = vec3(textureColor) * vertexColor * diffuseFactor * lightColor * lightPower * cosTheta * attenuation;
    }

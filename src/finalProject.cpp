@@ -1,19 +1,25 @@
-#define GLEW_STATIC 1 // This allows linking with Static Library on Windows, without DLL
+// MASSIMO MANGIOLA
+// 40235157
+// COMP 351 - QUIZ 2
+
+#define GLEW_STATIC 1
 #include <iostream>
-#include <GL/glew.h>                    // Include GLEW - OpenGL Extension Wrangler
-#include <GLFW/glfw3.h>                 // GLFW provides a cross-platform interface for creating a graphical context initializing OpenGL and binding inputs
-#include <glm/glm.hpp>                  // GLM is an optimized math library with syntax to similar to OpenGL Shading Language
-#include <glm/gtc/matrix_transform.hpp> // include this to create transformation matrices
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 #include <glm/common.hpp>
 #include <random>
 #include <fstream> // std::ifstream
 #include <sstream> // std::stringstream, std::stringbuf
+#include <vector>
 #include "glm/gtx/string_cast.hpp"
 #include "scoreboard.hpp"
 
 #include "objects/include.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
+// #include "OBJLoader.h"
 
 using namespace glm;
 using namespace std;
@@ -511,8 +517,8 @@ void setShadowMap(int shaderProgram, int value)
 
 // ************************* GLOBALIZATION FOR THE DRAWSCENE FUNCTION PARAMETERS ***************************
 // load textures
+GLuint brickID,skyID,cementID,glossyID,woodID,fabricID,metalID,tennisID, ballID, skinID, grassID, wallID, ad1ID, ad2ID, ad3ID, ad4ID, borderID;
 
-GLuint brickID,skyID,cementID,glossyID,woodID,fabricID,metalID,tennisID, ballID, skinID;
 
 // *** Creating the VAOs ***
 
@@ -526,7 +532,6 @@ int skyBox_VAO_inside;
 // To create the rackets. These matrices set the inital position of the
 // Rackets
 mat4 translationMatrixArray[2] = {
-
     translate(IDENTITY_MATRIX, vec3(-25.0f, 0.5, 8.0f)), // racket 1
     translate(IDENTITY_MATRIX, vec3(25.0f, 0.5, -8.0f)) // racket 2
  }; 
@@ -715,7 +720,6 @@ void drawScene(int shaderProgram, mat4 elbow[], mat4 wrist[])
     mat4 topBracket_translationMatrix = translate(IDENTITY_MATRIX, vec3(0.0f, 5.1, 0.0f));
 
     // The Left Bracket
-
     mat4 leftBracket_scaleMatrix = scale(IDENTITY_MATRIX, vec3(0.1f, 3.0f, 0.1f));
     mat4 leftBracket_rotationMatrix = rotate(IDENTITY_MATRIX, radians(0.0f), vec3(1.0, 0.0, 0.0f));
     mat4 leftBracket_translationMatrix = translate(IDENTITY_MATRIX, vec3(0.0f,2.2f,1.2f));
@@ -788,8 +792,10 @@ void drawScene(int shaderProgram, mat4 elbow[], mat4 wrist[])
     glDrawArrays(GL_TRIANGLES, 0, 36);
 #pragma endregion
 
+
 //                             ************* RENDER THE FLOOR *************
-#pragma region
+
+    #pragma region
     glBindTexture(GL_TEXTURE_2D, tennisID);
     grid_modelMatrix = translate(IDENTITY_MATRIX, vec3(0.0f, -0.3f, 0.0f)) *
                        rotate(IDENTITY_MATRIX, radians(0.0f), vec3(0.0f, 1.0f, 0.0f)) *
@@ -801,6 +807,15 @@ void drawScene(int shaderProgram, mat4 elbow[], mat4 wrist[])
     glDrawArrays(GL_TRIANGLES, 0, 36);
     colorLocation = glGetUniformLocation(shaderProgram, "myColor");
     glUniform3fv(colorLocation, 1, &colorBlack[0]);
+
+    // Render grass
+    colorLocation = glGetUniformLocation(shaderProgram, "myColor");
+    glUniform3fv(colorLocation, 1, &colorWhite[0]);
+    glBindTexture(GL_TEXTURE_2D, grassID);
+    mat4 floor_matrix = translate(mat4(1.0f), vec3(0.0f, -0.5f, 0.0f)) *
+                        scale(mat4(1.0f), vec3(100.0f, 0.5f, 100.0f));
+    glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "modelMatrix"), 1, GL_FALSE, &floor_matrix[0][0]);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
 
     // the rest of the net
     for (int i = 0; i < 73; i++)
@@ -815,6 +830,76 @@ void drawScene(int shaderProgram, mat4 elbow[], mat4 wrist[])
     }
     glBindTexture(GL_TEXTURE_2D, brickID);
 #pragma endregion
+    // ---- Render audience stands ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
+    glBindTexture(GL_TEXTURE_2D, wallID);
+    colorLocation = glGetUniformLocation(shaderProgram, "myColor");
+    glUniform3fv(colorLocation, 1, &colorWhite[0]);
+
+    // Dark walls
+    mat4 audience = translate(mat4(1.0f), vec3(0.0f, 2.0f, 30.0f)) * scale(mat4(1.0f), vec3(100.0f, 6.0f, 1.0f));
+    glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "modelMatrix"), 1, GL_FALSE, &audience[0][0]);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+    audience = translate(mat4(1.0f), vec3(0.0f, 2.0f, -30.0f)) * scale(mat4(1.0f), vec3(100.0f, 6.0f, 1.0f));
+    glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "modelMatrix"), 1, GL_FALSE, &audience[0][0]);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+    audience = translate(mat4(1.0f), vec3(-50.0f, 2.0f, 0.0f)) * scale(mat4(1.0f), vec3(1.0f, 6.0f, 60.0f));
+    glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "modelMatrix"), 1, GL_FALSE, &audience[0][0]);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+
+    // Light borders
+    glBindTexture(GL_TEXTURE_2D, borderID);
+    glUniform3fv(colorLocation, 1, &colorWhite[0]);
+
+    audience = translate(mat4(1.0f), vec3(0.0f, 5.0f, 30.0f)) * scale(mat4(1.0f), vec3(100.0f, 1.0f, 1.0f));
+    glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "modelMatrix"), 1, GL_FALSE, &audience[0][0]);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+    audience = translate(mat4(1.0f), vec3(0.0f, 5.0f, -30.0f)) * scale(mat4(1.0f), vec3(100.0f, 1.0f, 1.0f));
+    glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "modelMatrix"), 1, GL_FALSE, &audience[0][0]);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+    audience = translate(mat4(1.0f), vec3(-50.0f, 5.0f, 0.0f)) * scale(mat4(1.0f), vec3(1.0f, 1.0f, 60.0f));
+    glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "modelMatrix"), 1, GL_FALSE, &audience[0][0]);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+
+    glUniform3fv(colorLocation, 1, &colorWhite[0]);
+    // Advertisements
+    glBindTexture(GL_TEXTURE_2D, ad1ID);
+    audience = translate(mat4(1.0f), vec3(0.0f, 2.5f, 29.5f)) * scale(mat4(1.0f), vec3(10.0f, 4.0f, 0.1f));
+    glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "modelMatrix"), 1, GL_FALSE, &audience[0][0]);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+    glBindTexture(GL_TEXTURE_2D, ad2ID);
+    audience = translate(mat4(1.0f), vec3(-14.0f, 2.5f, 29.5f)) * scale(mat4(1.0f), vec3(10.0f, 4.0f, 0.1f));
+    glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "modelMatrix"), 1, GL_FALSE, &audience[0][0]);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+    glBindTexture(GL_TEXTURE_2D, ad1ID);
+    audience = translate(mat4(1.0f), vec3(-28.0f, 2.5f, 29.5f)) * scale(mat4(1.0f), vec3(10.0f, 4.0f, 0.1f));
+    glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "modelMatrix"), 1, GL_FALSE, &audience[0][0]);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+    glBindTexture(GL_TEXTURE_2D, ad2ID);
+    audience = translate(mat4(1.0f), vec3(-42.0f, 2.5f, 29.5f)) * scale(mat4(1.0f), vec3(10.0f, 4.0f, 0.1f));
+    glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "modelMatrix"), 1, GL_FALSE, &audience[0][0]);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+
+    glBindTexture(GL_TEXTURE_2D, ad3ID);
+    audience = translate(mat4(1.0f), vec3(0.0f, 2.5f, -29.5f)) * scale(mat4(1.0f), vec3(10.0f, 4.0f, 0.1f));
+    glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "modelMatrix"), 1, GL_FALSE, &audience[0][0]);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+    glBindTexture(GL_TEXTURE_2D, ad2ID);
+    audience = translate(mat4(1.0f), vec3(-14.0f, 2.5f, -29.5f)) * scale(mat4(1.0f), vec3(10.0f, 4.0f, 0.1f));
+    glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "modelMatrix"), 1, GL_FALSE, &audience[0][0]);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+    glBindTexture(GL_TEXTURE_2D, ad3ID);
+    audience = translate(mat4(1.0f), vec3(-28.0f, 2.5f, -29.5f)) * scale(mat4(1.0f), vec3(10.0f, 4.0f, 0.1f));
+    glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "modelMatrix"), 1, GL_FALSE, &audience[0][0]);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+    glBindTexture(GL_TEXTURE_2D, ad2ID);
+    audience = translate(mat4(1.0f), vec3(-42.0f, 2.5f, -29.5f)) * scale(mat4(1.0f), vec3(10.0f, 4.0f, 0.1f));
+    glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "modelMatrix"), 1, GL_FALSE, &audience[0][0]);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+
+    glBindTexture(GL_TEXTURE_2D, ad4ID);
+    audience = translate(mat4(1.0f), vec3(-49.0f, 2.5f, 0.0f)) * scale(mat4(1.0f), vec3(0.1f, 4.0f, 40.0f));
+    glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "modelMatrix"), 1, GL_FALSE, &audience[0][0]);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
 
     //                                     **************** RENDER THE TWO MODELS ****************
 
@@ -852,12 +937,12 @@ void drawScene(int shaderProgram, mat4 elbow[], mat4 wrist[])
 
         //                                     **************** RENDER THE HAND ****************
         // Model matrix of the racket handle
-
         #pragma region 
         // group matrix 3
         mat4 hand_groupMatrix = elbow_groupMatrix * hand_translationMatrix *  wrist[i] *  hand_rotationMatrix;
                                         
         mat4 hand_modelMatrix = hand_groupMatrix * hand_scaleMatrix *translate(IDENTITY_MATRIX, vec3(0.0f, 0.5f, 0.0f));
+
 
         setColorUniform(shaderProgram, colorSkin);
 
@@ -946,6 +1031,7 @@ void drawScene(int shaderProgram, mat4 elbow[], mat4 wrist[])
         // The vertical mesh
         for (int i = 0; i < 15; i++)
         {
+
             mat4 mesh_scaleMatrix = scale(IDENTITY_MATRIX, vec3(0.015f, 0.015f, 2.5f));
             mat4 mesh_rotationMatrix = rotate(IDENTITY_MATRIX, radians(0.0f), vec3(1.0f, 0.0f, 0.0f));
             mat4 mesh_translationMatrix = translate(IDENTITY_MATRIX, vec3(0.0f, 2.2 + (i/5.0f), 0.0f));
@@ -1029,6 +1115,7 @@ void drawScene(int shaderProgram, mat4 elbow[], mat4 wrist[])
     // glBindVertexArray(sphere);
     setColorUniform(shaderProgram, colorLightBlue);
 
+
     // glDrawElements(GL_TRIANGLES, vertexCount ,GL_UNSIGNED_INT,(void*)0);
 
     tennisBall.Draw(shaderProgram, glGetUniformLocation(shaderProgram, "modelMatrix"));
@@ -1052,9 +1139,11 @@ void drawSkyCube(int shaderProgram)
     setColorUniform(shaderProgram, colorBeige);
 
     // MVP matrices to create the model matrix of the BOX
-    mat4 BOX_scaleMatrix = scale(IDENTITY_MATRIX, vec3(FLOOR_WIDTH, 30.0f, FLOOR_HEIGHT));
+
+    mat4 BOX_scaleMatrix = scale(IDENTITY_MATRIX, vec3(100.0f, 30.0f, 100.0f));
     mat4 BOX_rotationMatrix = rotate(IDENTITY_MATRIX, radians(0.0f), vec3(1.0f, 0.0f, 0.0f));
-    mat4 BOX_translationMatrix = translate(IDENTITY_MATRIX, vec3(0.0f, -0.3, 0.0f));
+    mat4 BOX_translationMatrix = translate(IDENTITY_MATRIX, vec3(0.0f, -1.0f, 0.0f));
+
     mat4 BOX_modelMatrix = BOX_translationMatrix *
                            BOX_rotationMatrix *
                            BOX_scaleMatrix *
@@ -1170,8 +1259,18 @@ int main(int argc, char *argv[])
     fabricID = loadTexture("../assets/textures/fabric.jpg");
     metalID = loadTexture("../assets/textures/metal.jpg");
     tennisID = loadTexture("../assets/textures/court1.jpg");
+
+    ballID = loadTexture("../assets/textures/tennis2.jpg");
+    grassID = loadTexture("../assets/textures/grass.png");
+    wallID = loadTexture("../assets/textures/wall.png");
+    ad1ID = loadTexture("../assets/textures/ad1.png");
+    ad2ID = loadTexture("../assets/textures/ad2.png");
+    ad3ID = loadTexture("../assets/textures/ad3.png");
+    ad4ID = loadTexture("../assets/textures/ad4.png");
+    borderID = loadTexture("../assets/textures/border.png");
     skinID = loadTexture("../assets/textures/skin.jpg");
     
+
     // SET THE LIGHT COMPONENTS TO STARTING VALUES
     vec3 setAmbient = vec3(1.0, 1.0, 1.0);
     vec3 setDiffuse = vec3(1.0, 1.0, 1.0);
@@ -1318,6 +1417,7 @@ int main(int argc, char *argv[])
         // render the whole scene (net, grid, axis, two rackets and letters, skybox)
         drawScene(shaderProgram, elbow, wrist);
 
+
         // Turn textures off before drawing scoreboard
         setUseTexture(shaderProgram, 0);
         scoreboard.drawScoreboard(baseCube_VAO, shaderProgram);
@@ -1446,12 +1546,10 @@ int main(int argc, char *argv[])
             if (totalElbowRotationbackwards1 > backwardShouler1)
             {
                 rotationMatrixArray[1] = rotate(rotationMatrixArray[1], -radians(0.7f), vec3(0.0f, 0.0f, 1.0f));
-
                 totalElbowRotationbackwards1 -=  radians(0.7f);
             } else {
-                if(totalElbowRotation1 > minElbowFlex1 ){
+                if(totalElbowRotation1 > minElbowFlex1 ) {
                     elbow[1] = rotate(elbow[1], radians(0.3f), vec3(1.0f, 0.0f, 0.0f)); 
-
                     totalElbowRotation1 -= radians(0.3f);
                 }
                 if (totalShoulderRotation1 < maxShoulder1)
@@ -1465,9 +1563,9 @@ int main(int argc, char *argv[])
                     totalWristRotation1 += radians(0.6f);
                 }
             }
+
         } else if(glfwGetKey(window, GLFW_KEY_L) == GLFW_RELEASE){
             elbow[1] = IDENTITY_MATRIX;
-        
             totalElbowRotation1 = 0;
             rotationMatrixArray[1] = rotate(IDENTITY_MATRIX, radians(-30.0f), vec3(1.0f, 0.0f, 0.0f));
             totalShoulderRotation1 = 0;
@@ -1503,7 +1601,6 @@ int main(int argc, char *argv[])
             }
         } else if(glfwGetKey(window, GLFW_KEY_E) == GLFW_RELEASE){
             elbow[0] = IDENTITY_MATRIX;
-
             totalElbowRotation2 = 0.0f;
             rotationMatrixArray[0] = rotate(IDENTITY_MATRIX, radians(-30.0f), vec3(1.0f, 0.0f, 0.0f));
             totalShoulderRotation2 = 0.0f;
