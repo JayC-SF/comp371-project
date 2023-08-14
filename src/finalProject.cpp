@@ -1467,7 +1467,6 @@ int main(int argc, char *argv[])
             }
         } else if(glfwGetKey(window, GLFW_KEY_L) == GLFW_RELEASE){
             elbow[1] = IDENTITY_MATRIX;
-        }
             totalElbowRotation1 = 0;
             rotationMatrixArray[1] = rotate(IDENTITY_MATRIX, radians(-30.0f), vec3(1.0f, 0.0f, 0.0f));
             totalShoulderRotation1 = 0;
