@@ -37,6 +37,11 @@ vec3 colorWhite(1.0f, 1.0f, 1.0f);
 vec3 colorLightBlue(0.678f, 0.847f, 0.902f);
 #pragma endregion
 
+// GLOBAL SIZES VARIABLES
+const float FLOOR_WIDTH = 87.0f;
+const float TRANSLATE_ABOVE_GRID = 0.5f;
+const float FLOOR_HEIGHT = 45.0f;
+
 // 0 for triangles, 1 for points and 2 for lines
 int renderMode = 0;
 int currentRenderMode = GL_TRIANGLES;
@@ -72,16 +77,16 @@ TennisBall tennisBall;
 
 GLuint loadTexture(const char *filename)
 {
-    // Step1 Create and bind textures
+    // Step 1 Create and bind textures
     GLuint textureId = 0;
     glGenTextures(1, &textureId);
     assert(textureId != 0);
 
     glBindTexture(GL_TEXTURE_2D, textureId);
 
-    // Step2 Set filter parameters
-    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
-    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+    // Step 2 Set filter parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
@@ -515,7 +520,7 @@ void setShadowMap(int shaderProgram, int value){
 
 // ************************* GLOBALIZATION FOR THE DRAWSCENE FUNCTION PARAMETERS ***************************
 // load textures
-GLuint brickID,skyID,cementID,glossyID,woodID,fabricID,metalID,tennisID, ballID;
+GLuint brickID,skyID,cementID,glossyID,woodID,fabricID,metalID,tennisID, ballID, skinID;
 
 // *** Creating the VAOs ***
 
@@ -684,13 +689,13 @@ void drawScene(int shaderProgram, mat4 elbow [], mat4 wrist[])
     // SRT for the upper arm
     // Model matrix components for the upper arm
     mat4 upperArm_scaleMatrix = scale(IDENTITY_MATRIX, vec3(0.2f, 1.7f, 0.35f));
-    mat4 upperArm_rotationMatrix = rotate(IDENTITY_MATRIX, radians(-45.0f), vec3(1.0f, 0.0f, 0.0f));
+    mat4 upperArm_rotationMatrix = rotate(IDENTITY_MATRIX, radians(-FLOOR_HEIGHT), vec3(1.0f, 0.0f, 0.0f));
     mat4 upperArm_translationMatrix = IDENTITY_MATRIX;
 
     // SRT for the lower arm
     // Model matrix components for the lower arm
     mat4 lowerArm_scaleMatrix = scale(IDENTITY_MATRIX, vec3(0.2f, 1.7f, 0.35f));
-    mat4 lowerArm_rotationMatrix = rotate(IDENTITY_MATRIX, radians(45.0f), vec3(1.0f, 0.0f, 0.0f));
+    mat4 lowerArm_rotationMatrix = rotate(IDENTITY_MATRIX, radians(FLOOR_HEIGHT), vec3(1.0f, 0.0f, 0.0f));
     mat4 lowerArm_translationMatrix = translate(IDENTITY_MATRIX, vec3(0.0f, 1.7f, 0.0f));
 
     // SRT for the hand
@@ -732,6 +737,7 @@ void drawScene(int shaderProgram, mat4 elbow [], mat4 wrist[])
     //              ************************** START OF RENDERING **************************
     //                             ************* RENDER THE COURSE NET *************
     #pragma region
+
     setMaterial(shaderProgram, vec3(1.0), vec3(1.0), vec3(0.4, 0.4, 0.4), 1.f);
     glBindTexture(GL_TEXTURE_2D, brickID);
     // bind the standard cube with outward surfaces.
@@ -752,8 +758,6 @@ void drawScene(int shaderProgram, mat4 elbow [], mat4 wrist[])
         glDrawArrays(GL_TRIANGLES, 0, 36);
     }
  
-    // Cube * cube = Cube::GetInstance();
-    // cube->BindAttributes();
 
     // The top part of the net with thicker shape and different color
     glBindTexture(GL_TEXTURE_2D, fabricID);
@@ -764,31 +768,26 @@ void drawScene(int shaderProgram, mat4 elbow [], mat4 wrist[])
     glUniformMatrix4fv(grid_modelMatrixLocation, 1, GL_FALSE, &grid_modelMatrix[0][0]);
     colorLocation = glGetUniformLocation(shaderProgram, "myColor");
     glUniform3fv(colorLocation, 1, &colorWhite[0]);
-    // cube->SetRepeatUVCoord(vec3(0.08f, 0.5f, 36.0f));
-    // cube->Draw();
     glDrawArrays(GL_TRIANGLES, 0, 36);
 
     // the poles to hold the net
     colorLocation = glGetUniformLocation(shaderProgram, "myColor");
     glUniform3fv(colorLocation, 1, &colorGrey[0]);
     glBindTexture(GL_TEXTURE_2D, woodID);
-    // The top part of the net with thicker shape and different color
     mat4 poles_modelMatrix = translate(IDENTITY_MATRIX, vec3(0.0f, 1.5f, 0.0f)) *
                              rotate(IDENTITY_MATRIX, radians(90.0f), vec3(0.0f, 0.0f, 1.0f)) *
                              scale(IDENTITY_MATRIX, vec3(3.0f, 0.5f, 0.3f));
     GLuint poles_modelMatrixLocation = glGetUniformLocation(shaderProgram, "modelMatrix");
+    
+    // middle pole
     glUniformMatrix4fv(poles_modelMatrixLocation, 1, GL_FALSE, &poles_modelMatrix[0][0]);
     glDrawArrays(GL_TRIANGLES, 0, 36);
-
-    // cube->SetRepeatUVCoord(vec3(3.0f, 0.5f, 0.3f));
-    // cube->Draw();
-    // cube->UnbindAttributes();
-    // glBindVertexArray(baseCube_VAO);
 
     // right pole
     glUniformMatrix4fv(poles_modelMatrixLocation, 1, GL_FALSE, &(translate(IDENTITY_MATRIX, vec3(0.0f, 0.0f, 17.8f)) * poles_modelMatrix)[0][0]);
     glDrawArrays(GL_TRIANGLES, 0, 36);
-    // left pole pole
+
+    // left pole
     glUniformMatrix4fv(poles_modelMatrixLocation, 1, GL_FALSE, &(translate(IDENTITY_MATRIX, vec3(0.0f, 0.0f, -17.8f)) * poles_modelMatrix)[0][0]);
     glDrawArrays(GL_TRIANGLES, 0, 36);
     #pragma endregion
@@ -798,7 +797,7 @@ void drawScene(int shaderProgram, mat4 elbow [], mat4 wrist[])
     glBindTexture(GL_TEXTURE_2D, tennisID);
     grid_modelMatrix = translate(IDENTITY_MATRIX, vec3(0.0f, -0.3f, 0.0f)) *
                        rotate(IDENTITY_MATRIX, radians(0.0f), vec3(0.0f, 1.0f, 0.0f)) *
-                       scale(IDENTITY_MATRIX, vec3(87.0f, 0.5f, 45.0f));
+                       scale(IDENTITY_MATRIX, vec3(FLOOR_WIDTH, 0.5f, FLOOR_HEIGHT));
     grid_modelMatrixLocation = glGetUniformLocation(shaderProgram, "modelMatrix");
     glUniformMatrix4fv(grid_modelMatrixLocation, 1, GL_FALSE, &grid_modelMatrix[0][0]);
     colorLocation = glGetUniformLocation(shaderProgram, "myColor");
@@ -833,7 +832,7 @@ void drawScene(int shaderProgram, mat4 elbow [], mat4 wrist[])
         fullModel_rotationMatrix = rotationMatrixArray[i];
 
         //                                     **************** RENDER THE UPPER ARM ****************
-        glBindTexture(GL_TEXTURE_2D, fabricID);
+        glBindTexture(GL_TEXTURE_2D, skinID);
         setMaterial(shaderProgram, vec3(1.0), vec3(1.0), vec3(0.2, 0.2, 0.2), 1.f);
         // group matrix number 1
         mat4 shoulder_groupMatrix = fullModel_translationMatrix * fullModel_rotationMatrix * upperArm_translationMatrix * upperArm_rotationMatrix;
@@ -858,7 +857,6 @@ void drawScene(int shaderProgram, mat4 elbow [], mat4 wrist[])
 
         //                                     **************** RENDER THE HAND ****************  
         // Model matrix of the racket handle
-        glBindTexture(GL_TEXTURE_2D, fabricID);
         #pragma region 
         // group matrix 3
         mat4 hand_groupMatrix = elbow_groupMatrix * hand_translationMatrix *  wrist[i] *  hand_rotationMatrix;
@@ -1032,7 +1030,6 @@ void drawScene(int shaderProgram, mat4 elbow [], mat4 wrist[])
 
     // sphere = createSphere(resolution, .3f);
     // glBindVertexArray(sphere);
-    glBindTexture(GL_TEXTURE_2D, ballID);
     setColorUniform(shaderProgram, colorLightBlue);
     // glDrawElements(GL_TRIANGLES, vertexCount ,GL_UNSIGNED_INT,(void*)0);
 
@@ -1058,7 +1055,7 @@ void drawSkyCube(int shaderProgram){
 
 
     // MVP matrices to create the model matrix of the BOX
-    mat4 BOX_scaleMatrix = scale(IDENTITY_MATRIX, vec3(87.0f, 30.0f, 45.0f));
+    mat4 BOX_scaleMatrix = scale(IDENTITY_MATRIX, vec3(FLOOR_WIDTH, 30.0f, FLOOR_HEIGHT));
     mat4 BOX_rotationMatrix = rotate(IDENTITY_MATRIX, radians(0.0f), vec3(1.0f, 0.0f, 0.0f));
     mat4 BOX_translationMatrix = translate(IDENTITY_MATRIX, vec3(0.0f, -0.3, 0.0f));
     mat4 BOX_modelMatrix = BOX_translationMatrix *
@@ -1173,7 +1170,7 @@ int main(int argc, char *argv[])
     fabricID = loadTexture("../assets/textures/fabric.jpg");
     metalID = loadTexture("../assets/textures/metal.jpg");
     tennisID = loadTexture("../assets/textures/court1.jpg");
-    ballID = loadTexture("../assets/textures/tennis2.jpg");
+    skinID = loadTexture("../assets/textures/skin.jpg");
     
     // SET THE LIGHT COMPONENTS TO STARTING VALUES
     vec3 setAmbient = vec3(1.0, 1.0, 1.0);
@@ -1220,13 +1217,13 @@ int main(int argc, char *argv[])
     vec3 rABCameraPosition = vec3(0.0f, 7, -15.0f);
     vec3 rIBCameraPosition = vec3(0.0f, 7, 15.0f);
 
-    tennisBall = TennisBall(1.f, vec3(0.f, 8.f, 0.f), vec3(5.0f, 4.f, 0.f), vec3(0.f, -25.f, 0.f), 20.f);
+    tennisBall = TennisBall(0.5f, vec3(0.f, 8.f, 0.f), vec3(5.0f, 4.f, 0.f), vec3(0.f, -25.f, 0.f), 20.f);
 
-    // Plane(GLfloat pWidth, GLfloat pHeight, vec3 pNormal, vec3 pUpTiltVector, vec3 pPosition, const char * pPlaneName)
+    // Plane Constructor: Plane(GLfloat pWidth, GLfloat pHeight, vec3 pNormal, vec3 pUpTiltVector, vec3 pPosition, const char * pPlaneName)
     Plane groundPlane(100, 100, MY_UP, MY_LEFT, vec3(0.f), "Ground");
     Plane netPlane(100, 3.0, MY_RIGHT, MY_UP, vec3(0.f), "Tennis Net");
-    Plane backCourtPlane(100, 100, MY_LEFT, MY_UP, vec3(37.f, 0.f, 0.f), "backCourt");
-    Plane frontCourtPlane(100, 100, MY_RIGHT, MY_UP, vec3(-37.f, 0.f, 0.f), "frontCourtPlane");
+    Plane backCourtPlane(100, 100, MY_LEFT, MY_UP, vec3(FLOOR_WIDTH/2.0f, 0.f, 0.f), "backCourt");
+    Plane frontCourtPlane(100, 100, MY_RIGHT, MY_UP, vec3(-FLOOR_WIDTH/2.0f, 0.f, 0.f), "frontCourtPlane");
     Plane rightCourtPlane(100, 100, MY_FORWARD, MY_UP, vec3(0.f, 0.f, -22.5f), "rightCourtPlane");
     Plane leftCourtPlane(100, 100, MY_BACKWARD, MY_UP, vec3(0.f, 0.f, 22.5f), "leftCourtPlane");
 
@@ -1235,7 +1232,7 @@ int main(int argc, char *argv[])
     // racket 2 arrows
     Plane racket2Plane(3.0, 2.5, normals[1], MY_UP, centers[1], "racket2Plane");
 
-    
+    // Bind collision planes to tennis ball
     tennisBall.AddCollidingPlane(&groundPlane);
     tennisBall.AddCollidingPlane(&racket1Plane);
     tennisBall.AddCollidingPlane(&racket2Plane);

@@ -38,19 +38,19 @@ aIsUpdated(false){
 
 void TennisBall::Draw(GLuint pShaderProgramId, GLuint pModelMatrixLocation) {
     Update();
-    Sphere & sphere = Sphere::GetInstance();
-    Texture * tennisTexture = Texture::GetTennisBallTexture();
-    // bool isTextured = pShader->GetIsTextured();
-    // shader->SetIsTextured(true);
-    glUseProgram(pShaderProgramId);
-    sphere.BindAttributes();
-    tennisTexture->UseTexture();
     
-    // shader->SetModelMatrix(aModelMatrix);
+    // Update Sphere object after update()
+    glUseProgram(pShaderProgramId);
+    Sphere & sphere = Sphere::GetInstance();    
+    sphere.BindAttributes();
     glUniformMatrix4fv(pModelMatrixLocation, 1, GL_FALSE, &aModelMatrix[0][0]);
 
+    // Set Texture 
+    Texture * tennisTexture = Texture::GetTennisBallTexture();
+    tennisTexture->UseTexture();
+
+    // Draw Sphere
     sphere.Draw();
-    // shader->SetIsTextured(isTextured);
     sphere.UnbindAttributes();
 }
 
