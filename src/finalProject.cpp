@@ -2,6 +2,8 @@
 // 40235157
 // COMP 351 - QUIZ 2
 
+#include "gamelogic.h"
+#include "objects/tennisball.h"
 #define GLEW_STATIC 1
 #include <iostream>
 #include <GL/glew.h>
@@ -1311,7 +1313,7 @@ int main(int argc, char *argv[])
     vec3 rABCameraPosition = vec3(0.0f, 7, -15.0f);
     vec3 rIBCameraPosition = vec3(0.0f, 7, 15.0f);
 
-    tennisBall = TennisBall(0.5f, vec3(0.f, 8.f, 0.f), vec3(5.0f, 4.f, 0.f), vec3(0.f, -20.f, 0.f), 20.f);
+    tennisBall = TennisBall(0.5f, vec3(0.f, 8.f, 0.f), vec3(5.0f, 10.f, 0.f), vec3(0.f, -20.f, 0.f), 20.f);
 
     // Plane Constructor: Plane(GLfloat pWidth, GLfloat pHeight, vec3 pNormal, vec3 pUpTiltVector, vec3 pPosition, const char * pPlaneName)
     Plane groundPlane(100, 100, MY_UP, MY_LEFT, vec3(0.f), "Ground");
@@ -1336,6 +1338,9 @@ int main(int argc, char *argv[])
     tennisBall.AddCollidingPlane(&rightCourtPlane);
     tennisBall.AddCollidingPlane(&leftCourtPlane);
 
+    GameLogic gameLogic(&frontCourtPlane, &backCourtPlane, &scoreboard);
+    frontCourtPlane.Attach(&gameLogic);
+    backCourtPlane.Attach(&gameLogic);
 
     // Entering Main Loop
     while (!glfwWindowShouldClose(window))
@@ -1416,6 +1421,7 @@ int main(int argc, char *argv[])
         // Turn textures off before drawing scoreboard
         setUseTexture(shaderProgram, 0);
         scoreboard.drawScoreboard(baseCube_VAO, shaderProgram);
+        
         setUseTexture(shaderProgram, useTexture);
 
         // End frame

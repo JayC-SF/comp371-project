@@ -152,7 +152,7 @@ void TennisBall::CheckCollisions() {
                 // cout << "currentVelocity before" << aCurrentVelocity.x << " " << aCurrentVelocity.y << " " << aCurrentVelocity.z << endl;
                 aCurrentVelocity = reflect(aCurrentVelocity, planeNormal) + planeVelocity;
                 // cout << "currentVelocity after " << aCurrentVelocity.x << " " << aCurrentVelocity.y << " " << aCurrentVelocity.z << endl;
-
+                aCollidingPlanes[i]->Notify();
             }
         }
         aCollidingStates[i] = currentCollidingState;
