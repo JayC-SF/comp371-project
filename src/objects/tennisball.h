@@ -17,6 +17,7 @@ class TennisBall {
     void Translate(vec3 pTranslate);
     void aRotate(GLfloat aRads, vec3 pAxis);
     void Update();
+    GLfloat GetRadius();
     void SetRadius(GLfloat pRadius);
 
     // physics

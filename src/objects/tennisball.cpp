@@ -74,6 +74,13 @@ void TennisBall::Update() {
     aModelMatrix = translate(mat4(1.f), aCurrentPosition) * aRotation * aScale;
     aIsUpdated = true;
 }
+GLfloat TennisBall::GetRadius() {
+    return aRadius;
+}
+void printVector(vec3 v) {
+    cout << "(" << v.x << ", " << v.y << ", " << v.z << ")" << endl;
+
+}
 
 void TennisBall::UpdatePhysics(GLfloat dt) {
     // calculate position
@@ -95,15 +102,12 @@ void TennisBall::UpdatePhysics(GLfloat dt) {
     // calculate new velocity and collisions
     CheckCollisions();
     aIsUpdated = false;
+    printVector(aCurrentPosition);
 }
 
 void TennisBall::AddCollidingPlane(Plane * pPlane) {
     aCollidingPlanes.push_back(pPlane);
     aCollidingStates.push_back(false);
-}
-void printVector(vec3 v) {
-    cout << "(" << v.x << ", " << v.y << ", " << v.z << ")" << endl;
-
 }
 
 void TennisBall::CheckCollisions() {
