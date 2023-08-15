@@ -1475,45 +1475,59 @@ int main(int argc, char *argv[])
         // first racket movement (WASD)
         if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
         {
+            if(centers[0].z <=20){
             translateModelVector = MY_BACKWARD * (WASD_speed * dt);
             translationMatrixArray[0] = translationMatrixArray[0] * translate(IDENTITY_MATRIX, translateModelVector);
+            }
+            
         }
         if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         {
+            if(centers[0].z >=- 22){
             translateModelVector = MY_FORWARD * (WASD_speed * dt);
             translationMatrixArray[0] = translationMatrixArray[0] * translate(IDENTITY_MATRIX, translateModelVector);
+            }
         }
         if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
         {
+            if(centers[0].x <= -1){
             translateModelVector = MY_RIGHT * (WASD_speed * dt);
             translationMatrixArray[0] = translationMatrixArray[0] * translate(IDENTITY_MATRIX, translateModelVector);
+            }
         }
         if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
         {
+            if(centers[0].x >= -38){
             translateModelVector = MY_LEFT * (WASD_speed * dt);
-            translationMatrixArray[0] = translationMatrixArray[0] * translate(IDENTITY_MATRIX, translateModelVector);
+            translationMatrixArray[0] = translationMatrixArray[0] * translate(IDENTITY_MATRIX, translateModelVector);}
         }
 
         // second racket movement (ARROWS)
         if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
         {
+            if(centers[1].z <=20){
             translateModelVector = MY_BACKWARD * (ARROWS_speed * dt);
-            translationMatrixArray[1] = translationMatrixArray[1] * translate(IDENTITY_MATRIX, translateModelVector);
+            translationMatrixArray[1] = translationMatrixArray[1] * translate(IDENTITY_MATRIX, translateModelVector);}
         }
         if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
         {
+            if(centers[1].z >= -22){
             translateModelVector = MY_FORWARD * (ARROWS_speed * dt);
-            translationMatrixArray[1] = translationMatrixArray[1] * translate(IDENTITY_MATRIX, translateModelVector);
+            translationMatrixArray[1] = translationMatrixArray[1] * translate(IDENTITY_MATRIX, translateModelVector);}
         }
         if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
         {
+            if(centers[1].x <= 39){
             translateModelVector = MY_RIGHT * (ARROWS_speed * dt);
             translationMatrixArray[1] = translationMatrixArray[1] * translate(IDENTITY_MATRIX, translateModelVector);
+            }
         }
         if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
         {
+            if(centers[1].x >= 1){
             translateModelVector = MY_LEFT * (ARROWS_speed * dt);
             translationMatrixArray[1] = translationMatrixArray[1] * translate(IDENTITY_MATRIX, translateModelVector);
+            }
         }
         if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS && lastTstate == GLFW_RELEASE)
         {
