@@ -1311,7 +1311,7 @@ int main(int argc, char *argv[])
     vec3 rABCameraPosition = vec3(0.0f, 7, -15.0f);
     vec3 rIBCameraPosition = vec3(0.0f, 7, 15.0f);
 
-    tennisBall = TennisBall(0.5f, vec3(0.f, 8.f, 0.f), vec3(5.0f, 4.f, 0.f), vec3(0.f, -25.f, 0.f), 20.f);
+    tennisBall = TennisBall(0.5f, vec3(0.f, 8.f, 0.f), vec3(5.0f, 4.f, 0.f), vec3(0.f, -20.f, 0.f), 20.f);
 
     // Plane Constructor: Plane(GLfloat pWidth, GLfloat pHeight, vec3 pNormal, vec3 pUpTiltVector, vec3 pPosition, const char * pPlaneName)
     Plane groundPlane(100, 100, MY_UP, MY_LEFT, vec3(0.f), "Ground");
