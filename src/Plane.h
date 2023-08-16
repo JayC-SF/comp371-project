@@ -4,11 +4,12 @@
 #include <glm/glm.hpp>
 #include <vector>
 #include "SoundEngine.h"
+#include "ObserverPattern.h"
 
 using namespace glm;
 using  namespace std;
 
-class Plane{
+class Plane : public Subject{
     public:
     Plane(GLfloat pWidth, GLfloat pHeight, vec3 pNormal, vec3 pUpTiltVector, vec3 pPosition, const char * pPlaneName);
 
