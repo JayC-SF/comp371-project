@@ -14,14 +14,15 @@ using namespace glm;
 
 class GameLogic : public Observer{
     public:
-    GameLogic(Plane * pPlayer1Plane, Plane * pPlayer2Plane, Scoreboard * pScoreBoard, TennisBall * pTennisBall);
+    GameLogic(Plane * pPlayer1Plane, Plane * pPlayer2Plane, Plane * pRacket1Plane, Plane * pRacket2Plane, Scoreboard * pScoreBoard, TennisBall * pTennisBall);
     void Update(Subject * pSubject) override;
-    void SetBallToServingPosition(Plane * pPlane);
+    void SetBallToServingPosition(Plane * pPlane, Plane * pRacketPlane);
     void ServeBall();
+    void UpdateBallPositionIfServing();
     protected:
 
     GLuint aPlayer1Score, aPlayer2Score;
-    Plane * aPlayer1Plane, * aPlayer2Plane;
+    Plane * aPlayer1Plane, * aPlayer2Plane, * aRacket1Plane, * aRacket2Plane;
     Scoreboard * aScoreBoard;
     TennisBall * aTennisBall;
     // variable checking if the ball is being held in place until the player hits it off

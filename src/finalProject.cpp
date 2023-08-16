@@ -1338,11 +1338,13 @@ int main(int argc, char *argv[])
     tennisBall.AddCollidingPlane(&rightCourtPlane);
     tennisBall.AddCollidingPlane(&leftCourtPlane);
 
-    GameLogic gameLogic(&frontCourtPlane, &backCourtPlane, &scoreboard, &tennisBall);
+    GameLogic gameLogic(&frontCourtPlane, &backCourtPlane, &racket1Plane, &racket2Plane, &scoreboard, &tennisBall);
     frontCourtPlane.Attach(&gameLogic);
     backCourtPlane.Attach(&gameLogic);
+    racket1Plane.Attach(&gameLogic);
+    racket2Plane.Attach(&gameLogic);
     
-    gameLogic.SetBallToServingPosition(&backCourtPlane);
+    gameLogic.SetBallToServingPosition(&backCourtPlane, &racket2Plane);
 
     // Entering Main Loop
     while (!glfwWindowShouldClose(window))
@@ -1638,8 +1640,6 @@ int main(int argc, char *argv[])
             cameraPosition = vec3(40.0f, 20.0f, 0.0f);
         }
 
-        if (lastSpaceBarState == GLFW_RELEASE && glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
-            gameLogic.ServeBall();
 
         // update the space bar status.
         lastSpaceBarState = glfwGetKey(window, GLFW_KEY_SPACE);
