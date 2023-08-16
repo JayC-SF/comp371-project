@@ -3,20 +3,23 @@
 
 #include <stb_image.h>
 
-Texture::Texture() {
+Textures::Textures()
+{
     ClearAttributes();
 }
-Texture::Texture(const char * pFileLocation) {
+Textures::Textures(const char *pFileLocation)
+{
     ClearAttributes();
     aFileLocation = pFileLocation;
     LoadTexture();
 }
 
-void Texture::LoadTexture() {
-    unsigned char * textData = stbi_load(aFileLocation, &aWidth, &aHeight, &aBitDepth, 0);
+void Textures::LoadTexture()
+{
+    unsigned char *textData = stbi_load(aFileLocation, &aWidth, &aHeight, &aBitDepth, 0);
     if (!textData)
         fprintf(stderr, "FAILED TO FIND %s\n", aFileLocation);
-    
+
     glGenTextures(1, &aTextureID);
     glBindTexture(GL_TEXTURE_2D, aTextureID);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
@@ -31,92 +34,105 @@ void Texture::LoadTexture() {
         format = GL_RGB;
     else if (aBitDepth == 4)
         format = GL_RGBA;
-    
+
     glTexImage2D(GL_TEXTURE_2D, 0, format, aWidth, aHeight, 0, format, GL_UNSIGNED_BYTE, textData);
     glGenerateMipmap(GL_TEXTURE_2D);
-    
+
     glBindTexture(GL_TEXTURE_2D, 0);
-    
+
     // free image for future uses.
     stbi_image_free(textData);
 }
 
-void Texture::ClearAttributes() {
+void Textures::ClearAttributes()
+{
     aFileLocation = NULL, aTextureID = 0, aBitDepth = 0, aHeight = 0, aWidth = 0;
 }
-void Texture::ClearTexture() {
+void Textures::ClearTexture()
+{
     glDeleteTextures(1, &aTextureID);
     ClearAttributes();
 }
 
-void Texture::UseTexture() {
+void Textures::UseTexture()
+{
     glBindTexture(GL_TEXTURE_2D, aTextureID);
 }
 
-Texture::~Texture() {
+Textures::~Textures()
+{
     ClearTexture();
 }
 
-Texture * Texture::GetClayTexture() {
-    static Texture instance("../assets/textures/clay-tennis-court.png");
+Textures * Textures::GetClayTexture()
+{
+    static Textures instance("../assets/textures/clay-tennis-court.png");
     return &instance;
 }
-Texture * Texture::GetGlossyTexture() {
-    static Texture instance("../assets/textures/glossy.jpg");
-    return &instance;
-}
-
-Texture * Texture::GetTennisBallTexture() {
-    static Texture instance("../assets/textures/tennis-ball.jpeg");
+Textures * Textures::GetGlossyTexture()
+{
+    static Textures instance("../assets/textures/glossy.jpg");
     return &instance;
 }
 
-Texture * Texture::GetArmTexture() {
-    static Texture instance("../assets/textures/skin.jpg");
+Textures * Textures::GetTennisBallTexture()
+{
+    static Textures instance("../assets/textures/tennis-ball.jpeg");
     return &instance;
 }
 
-Texture * Texture::GetSilverMetalTexture() {
-    static Texture instance("../assets/textures/silver-metal.jpeg");
+Textures * Textures::GetArmTexture() {
+    static Textures instance("../assets/textures/skin.jpg");
     return &instance;
 }
 
-Texture * Texture::GetTennisStrapTexture() {
-    static Texture instance("../assets/textures/tennis-strap.jpg");
+Textures * Textures::GetSilverMetalTexture()
+{
+    static Textures instance("../assets/textures/silver-metal.jpeg");
     return &instance;
 }
 
-Texture * Texture::GetWoodTexture() {
-    static Texture instance("../assets/textures/wood.jpeg");
+Textures * Textures::GetTennisStrapTexture()
+{
+    static Textures instance("../assets/textures/tennis-strap.jpg");
     return &instance;
 }
 
-Texture * Texture::GetCementTexture() {
-    static Texture instance("../assets/textures/cement.jpeg");
+Textures * Textures::GetWoodTexture()
+{
+    static Textures instance("../assets/textures/wood.jpeg");
     return &instance;
 }
 
-Texture * Texture::GetTattooTexture() {
-    static Texture instance("../assets/textures/tattoo.jpeg");
+Textures * Textures::GetCementTexture()
+{
+    static Textures instance("../assets/textures/cement.jpeg");
     return &instance;
 }
 
-Texture * Texture::GetSkyTexture() {
-    static Texture instance("../assets/textures/sky.jpeg");
+Textures * Textures::GetTattooTexture()
+{
+    static Textures instance("../assets/textures/tattoo.jpeg");
     return &instance;
 }
 
-Texture * Texture::GetGrassTexture() {
-    static Texture instance("../assets/textures/grass.png");
+Textures * Textures::GetSkyTexture()
+{
+    static Textures instance("../assets/textures/sky.jpeg");
     return &instance;
 }
 
-Texture * Texture::GetWallTexture() {
-    static Texture instance("../assets/textures/wall.png");
+Textures * Textures::GetGrassTexture() {
+    static Textures instance("../assets/textures/grass.png");
     return &instance;
 }
 
-Texture * Texture::GetTennisCourtTexture() {
-    static Texture instance("../assets/textures/court1.jpg");
+Textures * Textures::GetWallTexture() {
+    static Textures instance("../assets/textures/wall.png");
+    return &instance;
+}
+
+Textures * Textures::GetTennisCourtTexture() {
+    static Textures instance("../assets/textures/court1.jpg");
     return &instance;
 }

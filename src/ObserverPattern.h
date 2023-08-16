@@ -3,6 +3,7 @@
 #include <vector>
 using namespace std;
 class Observer;
+
 class Subject {
     public:
     vector<Observer * > aObservers;

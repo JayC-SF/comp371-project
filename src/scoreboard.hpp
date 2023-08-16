@@ -3,7 +3,7 @@
 class Scoreboard
 {
 public:
-    const int MAXSCORE = 40;
+    static const int MAXSCORE = 40;
     int player1Score = 0, player2Score = 0;
     int minutes = 0, seconds = 0;
     glm::vec3 player1Color = glm::vec3(0.0f, 0.0f, 1.0f);
