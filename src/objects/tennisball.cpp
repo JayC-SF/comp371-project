@@ -159,7 +159,7 @@ void TennisBall::CheckCollisions() {
 
                 //SoundEngine->play2D("../assets/audio/bounce.wav", false);
                 aCollidingPlanes[i]->PlayCollisionSound();
-                //aCollidingPlanes[i]->Notify();
+                aCollidingPlanes[i]->Notify();
             }
         }
         aCollidingStates[i] = currentCollidingState;

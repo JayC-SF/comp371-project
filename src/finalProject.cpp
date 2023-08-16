@@ -1363,7 +1363,8 @@ int main(int argc, char *argv[])
 
     // Assign sounds to collision of tennis ball
     groundPlane.AddSound(bounceSound);
-    netPlane.AddSound(bounceSound);
+    netPlane.AddSound(crowdCheeringSound);
+    netPlane.AddSound(whistleSound);
     backCourtPlane.AddSound(whistleSound);
     backCourtPlane.AddSound(crowdCheeringSound);
     frontCourtPlane.AddSound(whistleSound);
