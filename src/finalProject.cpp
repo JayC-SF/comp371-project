@@ -1266,6 +1266,8 @@ int main(int argc, char *argv[])
     ad3ID = loadTexture("../assets/textures/ad3.png");
     ad4ID = loadTexture("../assets/textures/ad4.png");
     borderID = loadTexture("../assets/textures/border.png");
+
+    // ******************* AUDIO ********************
     
 
     // SET THE LIGHT COMPONENTS TO STARTING VALUES
