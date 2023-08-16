@@ -158,12 +158,9 @@ void TennisBall::CheckCollisions() {
                 // cout << "currentVelocity before" << aCurrentVelocity.x << " " << aCurrentVelocity.y << " " << aCurrentVelocity.z << endl;
                 aCurrentVelocity = reflect(aCurrentVelocity, planeNormal) + planeVelocity;
                 // cout << "currentVelocity after " << aCurrentVelocity.x << " " << aCurrentVelocity.y << " " << aCurrentVelocity.z << endl;
-<<<<<<< Updated upstream
 
-=======
-                aCollidingPlanes[i]->Notify();
+                // aCollidingPlanes[i]->Notify();
                 SoundEngine->play2D("../assets/audio/bounce.wav", false);
->>>>>>> Stashed changes
             }
         }
         aCollidingStates[i] = currentCollidingState;
