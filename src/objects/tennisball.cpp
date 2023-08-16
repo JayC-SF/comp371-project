@@ -118,7 +118,7 @@ void TennisBall::CheckCollisions() {
         // since normal is already a unit vector, no need to divide by magnitude
         GLfloat projMag = dot(planeToSphereCenter, planeNormal);
         
-        bool currentCollidingState = abs(projMag) < aRadius;
+        bool currentCollidingState = abs(projMag) < aRadius + 0.5;
         // check if projection magnitude is less than the radius length
         // if so check if point is inside the plane.
         if (currentCollidingState) {

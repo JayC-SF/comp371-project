@@ -1030,7 +1030,7 @@ void drawScene(int shaderProgram, mat4 elbow[], mat4 wrist[])
 
         //                                  *** RENDER THE RACKET MESH ***
         // Model matrix components for the racket mesh
-        // The vertical mesh
+        // The horizontal mesh
         for (int i = 0; i < 15; i++)
         {
 
@@ -1050,7 +1050,7 @@ void drawScene(int shaderProgram, mat4 elbow[], mat4 wrist[])
             glUniformMatrix4fv(mesh_modelMatrixLocation, 1, GL_FALSE, &mesh_modelMatrix[0][0]);
             glDrawArrays(currentRenderMode, 0, 36);
         }
-        // The horizontal mesh
+        // The vertical mesh
         for (int j = 0; j < 15; j++)
         {
             mat4 mesh_scaleMatrix = scale(IDENTITY_MATRIX, vec3(0.015f, 0.015f, 3.0f));
@@ -1072,7 +1072,7 @@ void drawScene(int shaderProgram, mat4 elbow[], mat4 wrist[])
 
          // ******************* two centres of the racket planes **********************
         // ***************************************************************************
-        mat4 mesh_scaleMatrix = scale(IDENTITY_MATRIX, vec3(0.015f, 1.7f, 1.3f));
+        mat4 mesh_scaleMatrix = scale(IDENTITY_MATRIX, vec3(0.015f, 3.0f, 2.5f));
         // mat4 mesh_rotationMatrix = rotate(IDENTITY_MATRIX, radians(0.0f), vec3(1.0f, 0.0f, 0.0f));
         mat4 mesh_translationMatrix = translate(IDENTITY_MATRIX, vec3(0.0f, 2.2, 0.0f));
         mat4 aCentre= racketHandle_groupMatrix *
@@ -1089,10 +1089,11 @@ void drawScene(int shaderProgram, mat4 elbow[], mat4 wrist[])
         centers[i] = vec3(aCentre * vec4(0.f, 0.f, 0.f, 1.f));
         // std::cout << glm::to_string(centers[i])<< std::endl;
 
+        mat4 aNormals = racketHandle_groupMatrix * mesh_translationMatrix * initialCubeTranslate;
         if (i == 0){
-            normals[i] = normalize(vec3(aCentre * vec4(-1.0f, 0.0f, 0.0f, 0.0f)));
-        }else if (i == 1 ){
-            normals[i] = normalize(vec3(aCentre * vec4(1.0f, 0.0f, 0.0f, 0.0f)));
+            normals[i] = normalize(vec3(aNormals * vec4(-1.0f, 0.0f, 0.0f, 0.0f)));
+        }else if (i == 1){
+            normals[i] = normalize(vec3(aNormals * vec4(1.0f, 0.0f, 0.0f, 0.0f)));
         }
         // std::cout << glm::to_string(normals[i])<< std::endl;
 
@@ -1319,16 +1320,16 @@ int main(int argc, char *argv[])
 
     // Plane Constructor: Plane(GLfloat pWidth, GLfloat pHeight, vec3 pNormal, vec3 pUpTiltVector, vec3 pPosition, const char * pPlaneName)
     Plane groundPlane(100, 100, MY_UP, MY_LEFT, vec3(0.f), "Ground");
-    Plane netPlane(100, 3.0, MY_RIGHT, MY_UP, vec3(0.f), "Tennis Net");
+    Plane netPlane(100, 3.55, MY_RIGHT, MY_UP, vec3(0.f), "Tennis Net");
     Plane backCourtPlane(100, 100, MY_LEFT, MY_UP, vec3(FLOOR_WIDTH/2.0f, 0.f, 0.f), "backCourt");
     Plane frontCourtPlane(100, 100, MY_RIGHT, MY_UP, vec3(-FLOOR_WIDTH/2.0f, 0.f, 0.f), "frontCourtPlane");
     Plane rightCourtPlane(100, 100, MY_FORWARD, MY_UP, vec3(0.f, 0.f, -22.5f), "rightCourtPlane");
     Plane leftCourtPlane(100, 100, MY_BACKWARD, MY_UP, vec3(0.f, 0.f, 22.5f), "leftCourtPlane");
 
     // racket 1 wasd
-    Plane racket1Plane(3.0, 2.5, normals[0], MY_UP, centers[0], "racket1Plane");
+    Plane racket1Plane(2.5, 3.0, normals[0], MY_UP, centers[0], "racket1Plane");
     // racket 2 arrows
-    Plane racket2Plane(3.0, 2.5, normals[1], MY_UP, centers[1], "racket2Plane");
+    Plane racket2Plane(2.5, 3.0, normals[1], MY_UP, centers[1], "racket2Plane");
 
     // Bind collision planes to tennis ball
     tennisBall.AddCollidingPlane(&groundPlane);
