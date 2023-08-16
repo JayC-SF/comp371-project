@@ -5,12 +5,7 @@
 #include "glm/geometric.hpp"
 #include <cstdio>
 #include <iostream>
-#include <irrKlang.h>
-using namespace irrklang;
-
-//Sound Engine typebeat
-ISoundEngine* SoundEngine = createIrrKlangDevice();
-
+#include "../SoundEngine.h"
 
 TennisBall::TennisBall() :
 aModelMatrix(mat4(1.f)), 
@@ -159,8 +154,9 @@ void TennisBall::CheckCollisions() {
                 aCurrentVelocity = reflect(aCurrentVelocity, planeNormal) + planeVelocity;
                 // cout << "currentVelocity after " << aCurrentVelocity.x << " " << aCurrentVelocity.y << " " << aCurrentVelocity.z << endl;
 
-                // aCollidingPlanes[i]->Notify();
-                SoundEngine->play2D("../assets/audio/bounce.wav", false);
+                //SoundEngine->play2D("../assets/audio/bounce.wav", false);
+                aCollidingPlanes[i]->PlayCollisionSound();
+               
             }
         }
         aCollidingStates[i] = currentCollidingState;

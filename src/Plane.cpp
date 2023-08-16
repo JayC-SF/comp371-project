@@ -1,5 +1,6 @@
 #include "Plane.h"
 #include <iostream>
+
 Plane::Plane(GLfloat pWidth, GLfloat pHeight, vec3 pNormal, vec3 pUpTiltVector, vec3 pCenterPosition, const char * pPlaneName) {
     aWidth = pWidth;
     aHeight = pHeight;
@@ -67,4 +68,14 @@ void Plane::UpdatePhysics(vec3 pPosition, vec3 pNormal, vec3 pUpTiltVector, GLfl
 
 const char * Plane::GetPlaneName() {
     return aPlaneName;
+}
+
+void Plane::PlayCollisionSound() {
+    for (int i = 0; i < aSoundSources.size(); i++) {
+        getSoundEngine()->play2D(aSoundSources[i], false);
+    }
+}
+
+void Plane::AddSound(ISoundSource* soundSource) {
+    aSoundSources.push_back(soundSource);
 }

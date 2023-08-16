@@ -3,6 +3,7 @@
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 #include <vector>
+#include "SoundEngine.h"
 
 using namespace glm;
 using  namespace std;
@@ -23,6 +24,8 @@ class Plane{
     void SetNormal(vec3 pNormal);
     void SetUpTiltVector(vec3 pUpTiltVector);
     const char * GetPlaneName();
+    void PlayCollisionSound();
+    void AddSound(ISoundSource* soundSource);
 
     void UpdatePhysics(vec3 pPosition, vec3 pNormal, vec3 pUpTiltVector, GLfloat dt);
 
@@ -43,6 +46,6 @@ class Plane{
     vec3 aCenterPosition;
     vec3 aVelocity;
     const char * aPlaneName;
-    
+    vector<ISoundSource*> aSoundSources;
 };
 #endif

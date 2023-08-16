@@ -1339,6 +1339,35 @@ int main(int argc, char *argv[])
     tennisBall.AddCollidingPlane(&leftCourtPlane);
 
 
+    // ------------- SOUND SOURCES ---------------
+
+    ISoundSource* crowdCheeringSound = getSoundEngine()->addSoundSourceFromFile("../assets/audio/crowdCheer.wav");
+    crowdCheeringSound->setDefaultVolume(0.1f);
+
+    ISoundSource* whistleSound = getSoundEngine()->addSoundSourceFromFile("../assets/audio/whistle.wav");
+    ISoundSource* bounceSound = getSoundEngine()->addSoundSourceFromFile("../assets/audio/bounce.mp3");
+    ISoundSource* tennisBallHitSound = getSoundEngine()->addSoundSourceFromFile("../assets/audio/tennisBallHit.wav");
+    ISoundSource* ambientMusic = getSoundEngine()->addSoundSourceFromFile("../assets/audio/ambientmusic.mp3");
+    ambientMusic->setDefaultVolume(0.1f);
+
+    // Assign sounds to collision of tennis ball
+    groundPlane.AddSound(bounceSound);
+    netPlane.AddSound(bounceSound);
+    backCourtPlane.AddSound(whistleSound);
+    backCourtPlane.AddSound(crowdCheeringSound);
+    frontCourtPlane.AddSound(whistleSound);
+    frontCourtPlane.AddSound(crowdCheeringSound);
+    rightCourtPlane.AddSound(bounceSound);
+    leftCourtPlane.AddSound(bounceSound);
+    racket1Plane.AddSound(tennisBallHitSound);
+    racket2Plane.AddSound(tennisBallHitSound);
+
+    // Background Music
+    getSoundEngine()->play2D(ambientMusic, true);
+
+    // -------------------------------------------
+
+
     // Entering Main Loop
     while (!glfwWindowShouldClose(window))
     {
