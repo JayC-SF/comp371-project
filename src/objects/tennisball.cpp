@@ -46,7 +46,7 @@ void TennisBall::Draw(GLuint pShaderProgramId, GLuint pModelMatrixLocation) {
     glUniformMatrix4fv(pModelMatrixLocation, 1, GL_FALSE, &aModelMatrix[0][0]);
 
     // Set Texture 
-    Texture * tennisTexture = Texture::GetTennisBallTexture();
+    Textures * tennisTexture = Textures::GetTennisBallTexture();
     tennisTexture->UseTexture();
 
     // Draw Sphere

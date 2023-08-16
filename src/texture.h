@@ -1,30 +1,32 @@
 #ifndef TEXTURE_H
 #define TEXTURE_H
 #include <GL/glew.h>
-class Texture {
-    public:
-    static Texture * GetClayTexture();
-    static Texture * GetGlossyTexture();
-    static Texture * GetTennisBallTexture();
-    static Texture * GetArmTexture();
-    static Texture * GetSilverMetalTexture();
-    static Texture * GetTennisStrapTexture();
-    static Texture * GetWoodTexture();
-    static Texture * GetCementTexture();
-    static Texture * GetTattooTexture();
-    static Texture * GetSkyTexture();
+class Textures
+{
+public:
+    static Textures *GetClayTexture();
+    static Textures *GetGlossyTexture();
+    static Textures *GetTennisBallTexture();
+    static Textures *GetArmTexture();
+    static Textures *GetSilverMetalTexture();
+    static Textures *GetTennisStrapTexture();
+    static Textures *GetWoodTexture();
+    static Textures *GetCementTexture();
+    static Textures *GetTattooTexture();
+    static Textures *GetSkyTexture();
 
-    Texture();
-    Texture(const char * pFileLocation);
-    ~Texture();
+    Textures();
+    Textures(const char *pFileLocation);
+    ~Textures();
 
     void LoadTexture();
     void UseTexture();
     void ClearTexture();
-    private:
+
+private:
     void ClearAttributes();
     GLuint aTextureID;
     int aWidth, aHeight, aBitDepth;
-    const char * aFileLocation;
+    const char *aFileLocation;
 };
 #endif

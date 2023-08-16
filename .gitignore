@@ -4,3 +4,6 @@ build/
 .vs/
 dist/
 .DS_Store
+thirdparty/assimp-build
+thirdparty/assimp-src
+thirdparty/assimp-subbuild

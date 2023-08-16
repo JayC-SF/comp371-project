@@ -77,8 +77,8 @@
        if(textureColor.a < 0.1){
          discard;
        }
-       ambientColor = vec3(textureColor) * vertexColor * ambientFactor;
-       diffuseColor = vec3(textureColor) * vertexColor * diffuseFactor * lightColor * lightPower * cosTheta * attenuation;
+       ambientColor = vec3(textureColor) * ambientFactor;
+       diffuseColor = vec3(textureColor) * diffuseFactor * lightColor * lightPower * cosTheta * attenuation;
    }
    else if (useTexture == 0)
    {

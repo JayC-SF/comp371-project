@@ -1,0 +1,28 @@
+# Blender 3.4.0 MTL File: 'GenTree-103_AE3D_03122023-F1.blend'
+# www.blender.org
+
+newmtl Material-Leaves
+Ks 0.045455 0.045455 0.045455
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+illum 2
+map_Kd textures/LEaf_Oak_Gum_AE3D_10302022-A.png
+map_d textures/LEaf_Oak_Gum_AE3D_10302022-A.png
+
+newmtl Material.Trunk_and_Primary_Limbs
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd textures/GenTree_2_Trunk_Limbs_AE3D_03312023-A-DIFFUSE.png
+map_Pr textures/GenTree_2_Trunk_Limbs_AE3D_03312023-A-SMOOTH.png
+
+newmtl Material.Twigs
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd textures/Gentree_2_Twigs_AE3D_04022023-B-DIFFUSE.jpg
+map_Pr textures/GenTree_2_Trunk_Limbs_AE3D_03312023-A-SMOOTH.png

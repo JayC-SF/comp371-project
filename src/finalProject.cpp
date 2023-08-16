@@ -19,7 +19,7 @@
 #include "objects/include.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
-// #include "OBJLoader.h"
+#include "modelLoader.h"
 
 using namespace glm;
 using namespace std;
@@ -517,8 +517,8 @@ void setShadowMap(int shaderProgram, int value)
 
 // ************************* GLOBALIZATION FOR THE DRAWSCENE FUNCTION PARAMETERS ***************************
 // load textures
-GLuint brickID,skyID,cementID,glossyID,woodID,fabricID,metalID,tennisID, ballID, skinID, grassID, wallID, ad1ID, ad2ID, ad3ID, ad4ID, borderID;
-
+int useTexture = 1;
+GLuint brickID, skyID, cementID, glossyID, woodID, fabricID, metalID, tennisID, ballID, skinID, grassID, wallID, ad1ID, ad2ID, ad3ID, ad4ID, borderID, metalBenchID;
 
 // *** Creating the VAOs ***
 
@@ -533,15 +533,14 @@ int skyBox_VAO_inside;
 // Rackets
 mat4 translationMatrixArray[2] = {
     translate(IDENTITY_MATRIX, vec3(-25.0f, 0.5, 8.0f)), // racket 1
-    translate(IDENTITY_MATRIX, vec3(25.0f, 0.5, -8.0f)) // racket 2
- }; 
-
+    translate(IDENTITY_MATRIX, vec3(25.0f, 0.5, -8.0f))  // racket 2
+};
 
 // Set the initial orientation of the rackets
 mat4 rotationMatrixArray[2] = {
-    rotate(IDENTITY_MATRIX, radians(-30.0f), vec3(1.0f, 0.0f, 0.0f)),  // racket 1
-    rotate(IDENTITY_MATRIX, radians(-30.0f), vec3(1.0f, 0.0f, 0.0f)) // racket 2
- }; 
+    rotate(IDENTITY_MATRIX, radians(-30.0f), vec3(1.0f, 0.0f, 0.0f)), // racket 1
+    rotate(IDENTITY_MATRIX, radians(-30.0f), vec3(1.0f, 0.0f, 0.0f))  // racket 2
+};
 
 mat4 fullModel_translationMatrix(1.0f);
 mat4 fullModel_rotationMatrix(1.0f);
@@ -562,15 +561,13 @@ mat4 wristFlexor_rotationMatrix1;
 mat4 elbowFlexor_rotationMatrix2;
 mat4 wristFlexor_rotationMatrix2;
 
-mat4 elbow [2] = {
+mat4 elbow[2] = {
     elbowFlexor_rotationMatrix1 = IDENTITY_MATRIX,
-    elbowFlexor_rotationMatrix2 = IDENTITY_MATRIX
-};
+    elbowFlexor_rotationMatrix2 = IDENTITY_MATRIX};
 
-mat4 wrist [2] = {
+mat4 wrist[2] = {
     wristFlexor_rotationMatrix1 = IDENTITY_MATRIX,
-    wristFlexor_rotationMatrix2 = IDENTITY_MATRIX
-};
+    wristFlexor_rotationMatrix2 = IDENTITY_MATRIX};
 
 // sphere VAO
 // source code obtained from here: https://github.com/carl-vbn/opengl-gravity-simulator/blob/main/src/rendering/baseModels/sphere.cpp
@@ -722,21 +719,21 @@ void drawScene(int shaderProgram, mat4 elbow[], mat4 wrist[])
     // The Left Bracket
     mat4 leftBracket_scaleMatrix = scale(IDENTITY_MATRIX, vec3(0.1f, 3.0f, 0.1f));
     mat4 leftBracket_rotationMatrix = rotate(IDENTITY_MATRIX, radians(0.0f), vec3(1.0, 0.0, 0.0f));
-    mat4 leftBracket_translationMatrix = translate(IDENTITY_MATRIX, vec3(0.0f,2.2f,1.2f));
+    mat4 leftBracket_translationMatrix = translate(IDENTITY_MATRIX, vec3(0.0f, 2.2f, 1.2f));
 
     // The right Bracket
     mat4 rightBracket_scaleMatrix = scale(IDENTITY_MATRIX, vec3(0.1f, 3.0f, 0.1f));
     mat4 rightBracket_rotationMatrix = rotate(IDENTITY_MATRIX, radians(0.0f), vec3(1.0, 0.0, 0.0f));
-    mat4 rightBracket_translationMatrix = translate(IDENTITY_MATRIX, vec3(0.0f,2.2f,-1.2f));
+    mat4 rightBracket_translationMatrix = translate(IDENTITY_MATRIX, vec3(0.0f, 2.2f, -1.2f));
 
     // matrix that translates the initial cube upwards by 0.5
     mat4 initialCubeTranslate = translate(IDENTITY_MATRIX, vec3(0.0f, 0.5f, 0.0f));
     GLuint initialCubeTranslateLocation = glGetUniformLocation(shaderProgram, "modelMatrix");
     glUniformMatrix4fv(initialCubeTranslateLocation, 1, GL_FALSE, &initialCubeTranslate[0][0]);
 
-    //              ************************** START OF RENDERING **************************
-    //                             ************* RENDER THE COURSE NET *************
-    #pragma region
+//              ************************** START OF RENDERING **************************
+//                             ************* RENDER THE COURSE NET *************
+#pragma region
 
     setMaterial(shaderProgram, vec3(1.0), vec3(1.0), vec3(0.4, 0.4, 0.4), 1.f);
     glBindTexture(GL_TEXTURE_2D, brickID);
@@ -757,7 +754,6 @@ void drawScene(int shaderProgram, mat4 elbow[], mat4 wrist[])
         glUniformMatrix4fv(grid_modelMatrixLocation, 1, GL_FALSE, &grid_modelMatrix[0][0]);
         glDrawArrays(GL_TRIANGLES, 0, 36);
     }
- 
 
     // The top part of the net with thicker shape and different color
     glBindTexture(GL_TEXTURE_2D, fabricID);
@@ -778,7 +774,7 @@ void drawScene(int shaderProgram, mat4 elbow[], mat4 wrist[])
                              rotate(IDENTITY_MATRIX, radians(90.0f), vec3(0.0f, 0.0f, 1.0f)) *
                              scale(IDENTITY_MATRIX, vec3(3.0f, 0.5f, 0.3f));
     GLuint poles_modelMatrixLocation = glGetUniformLocation(shaderProgram, "modelMatrix");
-    
+
     // middle pole
     glUniformMatrix4fv(poles_modelMatrixLocation, 1, GL_FALSE, &poles_modelMatrix[0][0]);
     glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -792,10 +788,9 @@ void drawScene(int shaderProgram, mat4 elbow[], mat4 wrist[])
     glDrawArrays(GL_TRIANGLES, 0, 36);
 #pragma endregion
 
+    //                             ************* RENDER THE FLOOR *************
 
-//                             ************* RENDER THE FLOOR *************
-
-    #pragma region
+#pragma region
     glBindTexture(GL_TEXTURE_2D, tennisID);
     grid_modelMatrix = translate(IDENTITY_MATRIX, vec3(0.0f, -0.3f, 0.0f)) *
                        rotate(IDENTITY_MATRIX, radians(0.0f), vec3(0.0f, 1.0f, 0.0f)) *
@@ -813,7 +808,7 @@ void drawScene(int shaderProgram, mat4 elbow[], mat4 wrist[])
     glUniform3fv(colorLocation, 1, &colorWhite[0]);
     glBindTexture(GL_TEXTURE_2D, grassID);
     mat4 floor_matrix = translate(mat4(1.0f), vec3(0.0f, -0.5f, 0.0f)) *
-                        scale(mat4(1.0f), vec3(100.0f, 0.5f, 100.0f));
+                        scale(mat4(1.0f), vec3(200.0f, 0.5f, 200.0f));
     glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "modelMatrix"), 1, GL_FALSE, &floor_matrix[0][0]);
     glDrawArrays(GL_TRIANGLES, 0, 36);
 
@@ -917,9 +912,10 @@ void drawScene(int shaderProgram, mat4 elbow[], mat4 wrist[])
         mat4 shoulder_groupMatrix = fullModel_translationMatrix * fullModel_rotationMatrix * upperArm_translationMatrix * upperArm_rotationMatrix;
         // The upper arm model matrix
 
-        mat4 upperArm_modelMatrix = shoulder_groupMatrix * upperArm_scaleMatrix * translate(IDENTITY_MATRIX, vec3(0.0f, 0.5f, 0.0f));;
-        // update shader 
-        setModelMatrix(shaderProgram, upperArm_modelMatrix);                      
+        mat4 upperArm_modelMatrix = shoulder_groupMatrix * upperArm_scaleMatrix * translate(IDENTITY_MATRIX, vec3(0.0f, 0.5f, 0.0f));
+        ;
+        // update shader
+        setModelMatrix(shaderProgram, upperArm_modelMatrix);
         setColorUniform(shaderProgram, colorSkin);
         glDrawArrays(currentRenderMode, 0, 36);
 
@@ -935,14 +931,13 @@ void drawScene(int shaderProgram, mat4 elbow[], mat4 wrist[])
         glDrawArrays(currentRenderMode, 0, 36);
 #pragma endregion
 
-        //                                     **************** RENDER THE HAND ****************
-        // Model matrix of the racket handle
-        #pragma region 
+//                                     **************** RENDER THE HAND ****************
+// Model matrix of the racket handle
+#pragma region
         // group matrix 3
-        mat4 hand_groupMatrix = elbow_groupMatrix * hand_translationMatrix *  wrist[i] *  hand_rotationMatrix;
-                                        
-        mat4 hand_modelMatrix = hand_groupMatrix * hand_scaleMatrix *translate(IDENTITY_MATRIX, vec3(0.0f, 0.5f, 0.0f));
+        mat4 hand_groupMatrix = elbow_groupMatrix * hand_translationMatrix * wrist[i] * hand_rotationMatrix;
 
+        mat4 hand_modelMatrix = hand_groupMatrix * hand_scaleMatrix * translate(IDENTITY_MATRIX, vec3(0.0f, 0.5f, 0.0f));
 
         setColorUniform(shaderProgram, colorSkin);
 
@@ -1034,7 +1029,7 @@ void drawScene(int shaderProgram, mat4 elbow[], mat4 wrist[])
 
             mat4 mesh_scaleMatrix = scale(IDENTITY_MATRIX, vec3(0.015f, 0.015f, 2.5f));
             mat4 mesh_rotationMatrix = rotate(IDENTITY_MATRIX, radians(0.0f), vec3(1.0f, 0.0f, 0.0f));
-            mat4 mesh_translationMatrix = translate(IDENTITY_MATRIX, vec3(0.0f, 2.2 + (i/5.0f), 0.0f));
+            mat4 mesh_translationMatrix = translate(IDENTITY_MATRIX, vec3(0.0f, 2.2 + (i / 5.0f), 0.0f));
 
             // Model matrix of the racket handle
             mat4 mesh_modelMatrix = racketHandle_groupMatrix *
@@ -1053,7 +1048,7 @@ void drawScene(int shaderProgram, mat4 elbow[], mat4 wrist[])
         {
             mat4 mesh_scaleMatrix = scale(IDENTITY_MATRIX, vec3(0.015f, 0.015f, 3.0f));
             mat4 mesh_rotationMatrix = rotate(IDENTITY_MATRIX, radians(90.0f), vec3(1.0f, 0.0f, 0.0f));
-            mat4 mesh_translationMatrix = translate(IDENTITY_MATRIX, vec3(0.0f, 3.7f, -1.20f + (j/6.0f)));
+            mat4 mesh_translationMatrix = translate(IDENTITY_MATRIX, vec3(0.0f, 3.7f, -1.20f + (j / 6.0f)));
 
             // Model matrix of the racket handle
             mat4 mesh_modelMatrix = racketHandle_groupMatrix *
@@ -1068,16 +1063,16 @@ void drawScene(int shaderProgram, mat4 elbow[], mat4 wrist[])
             glDrawArrays(currentRenderMode, 0, 36);
         }
 
-         // ******************* two centres of the racket planes **********************
+        // ******************* two centres of the racket planes **********************
         // ***************************************************************************
         mat4 mesh_scaleMatrix = scale(IDENTITY_MATRIX, vec3(0.015f, 1.7f, 1.3f));
         // mat4 mesh_rotationMatrix = rotate(IDENTITY_MATRIX, radians(0.0f), vec3(1.0f, 0.0f, 0.0f));
         mat4 mesh_translationMatrix = translate(IDENTITY_MATRIX, vec3(0.0f, 2.2, 0.0f));
-        mat4 aCentre= racketHandle_groupMatrix *
-                                    mesh_translationMatrix *
-                                    // mesh_rotationMatrix *
-                                    mesh_scaleMatrix *
-                                    initialCubeTranslate;
+        mat4 aCentre = racketHandle_groupMatrix *
+                       mesh_translationMatrix *
+                       // mesh_rotationMatrix *
+                       mesh_scaleMatrix *
+                       initialCubeTranslate;
         // mat4 aCentre = racketHandle_groupMatrix * translate(IDENTITY_MATRIX, vec3(0.0f, 3.05f, 0.0f)) * scale(IDENTITY_MATRIX, vec3(0.1f, 4.f, 2.5f)) * initialCubeTranslate;
         GLuint centreLocation = glGetUniformLocation(shaderProgram, "modelMatrix");
         glUniformMatrix4fv(centreLocation, 1, GL_FALSE, &aCentre[0][0]);
@@ -1087,20 +1082,21 @@ void drawScene(int shaderProgram, mat4 elbow[], mat4 wrist[])
         centers[i] = vec3(aCentre * vec4(0.f, 0.f, 0.f, 1.f));
         // std::cout << glm::to_string(centers[i])<< std::endl;
 
-        if (i == 0){
+        if (i == 0)
+        {
             normals[i] = normalize(vec3(aCentre * vec4(-1.0f, 0.0f, 0.0f, 0.0f)));
-        }else if (i == 1 ){
+        }
+        else if (i == 1)
+        {
             normals[i] = normalize(vec3(aCentre * vec4(1.0f, 0.0f, 0.0f, 0.0f)));
         }
         // std::cout << glm::to_string(normals[i])<< std::endl;
 
         // ***************************************************************************
         // ***************************************************************************
-
-        
     }
 
-    // ********************************** SPHERE ******************************************* 
+    // ********************************** SPHERE *******************************************
     // to be removed eventually
     // mat4 sphere_scaleMatrix = scale(IDENTITY_MATRIX, vec3(1.0f, 1.0f, 1.0f));
     // mat4 sphere_rotationMatrix = rotate(IDENTITY_MATRIX, radians(0.0f), vec3(0.0f, 1.0f, 0.0f));
@@ -1115,10 +1111,16 @@ void drawScene(int shaderProgram, mat4 elbow[], mat4 wrist[])
     // glBindVertexArray(sphere);
     setColorUniform(shaderProgram, colorLightBlue);
 
-
     // glDrawElements(GL_TRIANGLES, vertexCount ,GL_UNSIGNED_INT,(void*)0);
 
     tennisBall.Draw(shaderProgram, glGetUniformLocation(shaderProgram, "modelMatrix"));
+
+    //                      ********************************* SCORE BOARD ***********************************
+    // Turn textures off before drawing scoreboard
+    setUseTexture(shaderProgram, 0);
+    Scoreboard scoreboard = Scoreboard();
+    scoreboard.drawScoreboard(baseCube_VAO, shaderProgram);
+    setUseTexture(shaderProgram, useTexture);
 }
 
 void drawSkyCube(int shaderProgram)
@@ -1140,7 +1142,7 @@ void drawSkyCube(int shaderProgram)
 
     // MVP matrices to create the model matrix of the BOX
 
-    mat4 BOX_scaleMatrix = scale(IDENTITY_MATRIX, vec3(100.0f, 30.0f, 100.0f));
+    mat4 BOX_scaleMatrix = scale(IDENTITY_MATRIX, vec3(200.0f, 200.0f, 200.0f));
     mat4 BOX_rotationMatrix = rotate(IDENTITY_MATRIX, radians(0.0f), vec3(1.0f, 0.0f, 0.0f));
     mat4 BOX_translationMatrix = translate(IDENTITY_MATRIX, vec3(0.0f, -1.0f, 0.0f));
 
@@ -1153,8 +1155,59 @@ void drawSkyCube(int shaderProgram)
     glDrawArrays(currentRenderMode, 0, 36);
 }
 
-// Scoreboard object
-Scoreboard scoreboard = Scoreboard();
+void drawModels(int shaderProgram, std::vector<Model> &Models)
+{
+    glm::mat4 transform = glm::translate(IDENTITY_MATRIX, glm::vec3(-50.0f, 0.0f, 5.0f));
+    setModelMatrix(shaderProgram, transform);
+    Models[0].draw();
+
+    transform = glm::translate(IDENTITY_MATRIX, glm::vec3(-53.0f, 0.0f, 30.0f));
+    setModelMatrix(shaderProgram, transform);
+    Models[0].draw();
+
+    transform = glm::translate(IDENTITY_MATRIX, glm::vec3(-52.0f, 0.0f, -15.0f));
+    setModelMatrix(shaderProgram, transform);
+    Models[0].draw();
+
+    transform = glm::translate(IDENTITY_MATRIX, glm::vec3(-55.0f, 0.0f, -40.0f));
+    setModelMatrix(shaderProgram, transform);
+    Models[0].draw();
+
+    transform = glm::translate(IDENTITY_MATRIX, glm::vec3(-45.0f, 0.0f, -70.0f));
+    setModelMatrix(shaderProgram, transform);
+    Models[0].draw();
+
+    transform = glm::translate(IDENTITY_MATRIX, glm::vec3(-35.0f, 0.0f, -50.0f));
+    setModelMatrix(shaderProgram, transform);
+    Models[0].draw();
+
+    transform = glm::translate(IDENTITY_MATRIX, glm::vec3(-45.0f, 0.0f, 70.0f));
+    setModelMatrix(shaderProgram, transform);
+    Models[0].draw();
+
+    transform = glm::translate(IDENTITY_MATRIX, glm::vec3(-35.0f, 0.0f, 50.0f));
+    setModelMatrix(shaderProgram, transform);
+    Models[0].draw();
+
+    glBindTexture(GL_TEXTURE_2D, metalBenchID);
+    transform = glm::translate(IDENTITY_MATRIX, glm::vec3(0.0f, 0.0f, 40.0f));
+    transform = glm::scale(transform, glm::vec3(0.2f, 0.2f, 0.2f));
+    transform = glm::rotate(transform, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    setModelMatrix(shaderProgram, transform);
+    Models[1].draw();
+
+    transform = glm::translate(IDENTITY_MATRIX, glm::vec3(-25.0f, 0.0f, 40.0f));
+    transform = glm::scale(transform, glm::vec3(0.2f, 0.2f, 0.2f));
+    transform = glm::rotate(transform, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    setModelMatrix(shaderProgram, transform);
+    Models[1].draw();
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    transform = glm::translate(IDENTITY_MATRIX, glm::vec3(0.0f, 0.0f, -50.0f));
+    transform = glm::scale(transform, glm::vec3(2.0f, 2.0f, 2.0f));
+    setModelMatrix(shaderProgram, transform);
+    Models[2].draw();
+}
 
 int main(int argc, char *argv[])
 {
@@ -1241,12 +1294,11 @@ int main(int argc, char *argv[])
 
 #pragma endregion
 
-    vec3 lightPos = vec3(25.0f, 30.0f, -5.0f);
+    vec3 lightPos = vec3(25.0f, 20.0f, -5.0f);
     GLuint lightLocation = glGetUniformLocation(shaderProgram, "lightPos");
     float lightRotationSpeed = 25.0f;
 
     // texture
-    int useTexture = 1;
     setUseTexture(shaderProgram, 1);
     int lastTstate = GLFW_RELEASE;
 
@@ -1269,7 +1321,15 @@ int main(int argc, char *argv[])
     ad4ID = loadTexture("../assets/textures/ad4.png");
     borderID = loadTexture("../assets/textures/border.png");
     skinID = loadTexture("../assets/textures/skin.jpg");
-    
+
+    // Model textures
+    metalBenchID = loadTexture("../assets/models/bleacher/MetalBench01.png");
+
+    // Load models
+    std::vector<Model> models;
+    models.push_back(Model("../assets/models/tree/GenTree-103_AE3D_03122023-F1.obj"));
+    models.push_back(Model("../assets/models/bleacher/Bench01.obj"));
+    models.push_back(Model("../assets/models/grandstand/generic medium.obj"));
 
     // SET THE LIGHT COMPONENTS TO STARTING VALUES
     vec3 setAmbient = vec3(1.0, 1.0, 1.0);
@@ -1321,8 +1381,8 @@ int main(int argc, char *argv[])
     // Plane Constructor: Plane(GLfloat pWidth, GLfloat pHeight, vec3 pNormal, vec3 pUpTiltVector, vec3 pPosition, const char * pPlaneName)
     Plane groundPlane(100, 100, MY_UP, MY_LEFT, vec3(0.f), "Ground");
     Plane netPlane(100, 3.0, MY_RIGHT, MY_UP, vec3(0.f), "Tennis Net");
-    Plane backCourtPlane(100, 100, MY_LEFT, MY_UP, vec3(FLOOR_WIDTH/2.0f, 0.f, 0.f), "backCourt");
-    Plane frontCourtPlane(100, 100, MY_RIGHT, MY_UP, vec3(-FLOOR_WIDTH/2.0f, 0.f, 0.f), "frontCourtPlane");
+    Plane backCourtPlane(100, 100, MY_LEFT, MY_UP, vec3(FLOOR_WIDTH / 2.0f, 0.f, 0.f), "backCourt");
+    Plane frontCourtPlane(100, 100, MY_RIGHT, MY_UP, vec3(-FLOOR_WIDTH / 2.0f, 0.f, 0.f), "frontCourtPlane");
     Plane rightCourtPlane(100, 100, MY_FORWARD, MY_UP, vec3(0.f, 0.f, -22.5f), "rightCourtPlane");
     Plane leftCourtPlane(100, 100, MY_BACKWARD, MY_UP, vec3(0.f, 0.f, 22.5f), "leftCourtPlane");
 
@@ -1340,7 +1400,6 @@ int main(int argc, char *argv[])
     tennisBall.AddCollidingPlane(&frontCourtPlane);
     tennisBall.AddCollidingPlane(&rightCourtPlane);
     tennisBall.AddCollidingPlane(&leftCourtPlane);
-
 
     // Entering Main Loop
     while (!glfwWindowShouldClose(window))
@@ -1368,6 +1427,7 @@ int main(int argc, char *argv[])
         glUniformMatrix4fv(light_MVP_Depth_MatrixLocation, 1, GL_FALSE, &light_MVP_Matrix[0][0]);
 
         drawScene(depthShaderProgram, elbow, wrist);
+        drawModels(depthShaderProgram, models);
 
         // SECOND PASS (using normal shader program)
         // -----------------------------------------
@@ -1382,12 +1442,12 @@ int main(int argc, char *argv[])
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         drawScene(shaderProgram, elbow, wrist);
+        drawModels(shaderProgram, models);
 
         // Update Physics of both rackets and tennis ball
-        racket1Plane.UpdatePhysics(centers[0], normals[0], racket1Plane.GetUpTiltVector(),dt);
-        racket2Plane.UpdatePhysics(centers[1], normals[1], racket2Plane.GetUpTiltVector(),dt);
+        racket1Plane.UpdatePhysics(centers[0], normals[0], racket1Plane.GetUpTiltVector(), dt);
+        racket2Plane.UpdatePhysics(centers[1], normals[1], racket2Plane.GetUpTiltVector(), dt);
         tennisBall.UpdatePhysics(dt);
-
 
         drawSkyCube(shaderProgram);
 
@@ -1416,12 +1476,6 @@ int main(int argc, char *argv[])
 
         // render the whole scene (net, grid, axis, two rackets and letters, skybox)
         drawScene(shaderProgram, elbow, wrist);
-
-
-        // Turn textures off before drawing scoreboard
-        setUseTexture(shaderProgram, 0);
-        scoreboard.drawScoreboard(baseCube_VAO, shaderProgram);
-        setUseTexture(shaderProgram, useTexture);
 
         // End frame
         glfwSwapBuffers(window);
@@ -1462,13 +1516,17 @@ int main(int argc, char *argv[])
         if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
         {
             WASD_speed = 2 * objectSpeed;
-        }else {
+        }
+        else
+        {
             WASD_speed = objectSpeed;
         }
         if (glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS)
         {
             ARROWS_speed = 2 * objectSpeed;
-        }else {
+        }
+        else
+        {
             ARROWS_speed = objectSpeed;
         }
         // first racket movement (WASD)
@@ -1546,10 +1604,13 @@ int main(int argc, char *argv[])
             if (totalElbowRotationbackwards1 > backwardShouler1)
             {
                 rotationMatrixArray[1] = rotate(rotationMatrixArray[1], -radians(0.7f), vec3(0.0f, 0.0f, 1.0f));
-                totalElbowRotationbackwards1 -=  radians(0.7f);
-            } else {
-                if(totalElbowRotation1 > minElbowFlex1 ) {
-                    elbow[1] = rotate(elbow[1], radians(0.3f), vec3(1.0f, 0.0f, 0.0f)); 
+                totalElbowRotationbackwards1 -= radians(0.7f);
+            }
+            else
+            {
+                if (totalElbowRotation1 > minElbowFlex1)
+                {
+                    elbow[1] = rotate(elbow[1], radians(0.3f), vec3(1.0f, 0.0f, 0.0f));
                     totalElbowRotation1 -= radians(0.3f);
                 }
                 if (totalShoulderRotation1 < maxShoulder1)
@@ -1563,8 +1624,9 @@ int main(int argc, char *argv[])
                     totalWristRotation1 += radians(0.6f);
                 }
             }
-
-        } else if(glfwGetKey(window, GLFW_KEY_L) == GLFW_RELEASE){
+        }
+        else if (glfwGetKey(window, GLFW_KEY_L) == GLFW_RELEASE)
+        {
             elbow[1] = IDENTITY_MATRIX;
             totalElbowRotation1 = 0;
             rotationMatrixArray[1] = rotate(IDENTITY_MATRIX, radians(-30.0f), vec3(1.0f, 0.0f, 0.0f));
@@ -1599,7 +1661,9 @@ int main(int argc, char *argv[])
                     totalWristRotation2 -= radians(0.6f);
                 }
             }
-        } else if(glfwGetKey(window, GLFW_KEY_E) == GLFW_RELEASE){
+        }
+        else if (glfwGetKey(window, GLFW_KEY_E) == GLFW_RELEASE)
+        {
             elbow[0] = IDENTITY_MATRIX;
             totalElbowRotation2 = 0.0f;
             rotationMatrixArray[0] = rotate(IDENTITY_MATRIX, radians(-30.0f), vec3(1.0f, 0.0f, 0.0f));
