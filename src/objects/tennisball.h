@@ -18,6 +18,9 @@ class TennisBall {
     void aRotate(GLfloat aRads, vec3 pAxis);
     void Update();
     GLfloat GetRadius();
+    vec3 GetPosition();
+    vec3 GetVelocity();
+    vec3 GetAcceleration();
     void SetRadius(GLfloat pRadius);
 
     // physics

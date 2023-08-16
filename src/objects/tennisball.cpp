@@ -102,7 +102,6 @@ void TennisBall::UpdatePhysics(GLfloat dt) {
     // calculate new velocity and collisions
     CheckCollisions();
     aIsUpdated = false;
-    printVector(aCurrentPosition);
 }
 
 void TennisBall::AddCollidingPlane(Plane * pPlane) {
@@ -171,4 +170,14 @@ void TennisBall::SetPosition(vec3 pPosition) {
 }
 void TennisBall::SetAcceleration(vec3 pAcceleration) {
     aCurrentAcceleration = pAcceleration;
+}
+
+vec3 TennisBall::GetPosition() {
+    return aCurrentPosition;
+}
+vec3 TennisBall::GetVelocity() {
+    return aCurrentVelocity;
+}
+vec3 TennisBall::GetAcceleration() {
+    return aCurrentAcceleration;
 }

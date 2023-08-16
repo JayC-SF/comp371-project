@@ -1636,6 +1636,9 @@ int main(int argc, char *argv[])
             cameraPosition = vec3(40.0f, 20.0f, 0.0f);
         }
 
+        if (lastSpaceBarState == GLFW_RELEASE && glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+            gameLogic.ServeBall();
+
         // update the space bar status.
         lastSpaceBarState = glfwGetKey(window, GLFW_KEY_SPACE);
         lastAState = glfwGetKey(window, GLFW_KEY_A);
