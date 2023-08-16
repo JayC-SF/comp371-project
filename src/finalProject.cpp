@@ -1338,11 +1338,12 @@ int main(int argc, char *argv[])
     tennisBall.AddCollidingPlane(&rightCourtPlane);
     tennisBall.AddCollidingPlane(&leftCourtPlane);
 
-    GameLogic gameLogic(&frontCourtPlane, &backCourtPlane, &racket1Plane, &racket2Plane, &scoreboard, &tennisBall);
+    GameLogic gameLogic(&frontCourtPlane, &backCourtPlane, &racket1Plane, &racket2Plane, &netPlane, &scoreboard, &tennisBall);
     frontCourtPlane.Attach(&gameLogic);
     backCourtPlane.Attach(&gameLogic);
     racket1Plane.Attach(&gameLogic);
     racket2Plane.Attach(&gameLogic);
+    netPlane.Attach(&gameLogic);
     
     gameLogic.SetBallToServingPosition(&backCourtPlane, &racket2Plane);
 
