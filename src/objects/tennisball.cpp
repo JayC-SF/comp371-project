@@ -5,6 +5,7 @@
 #include "glm/geometric.hpp"
 #include <cstdio>
 #include <iostream>
+#include "../SoundEngine.h"
 
 TennisBall::TennisBall() :
 aModelMatrix(mat4(1.f)), 
@@ -46,7 +47,7 @@ void TennisBall::Draw(GLuint pShaderProgramId, GLuint pModelMatrixLocation) {
     glUniformMatrix4fv(pModelMatrixLocation, 1, GL_FALSE, &aModelMatrix[0][0]);
 
     // Set Texture 
-    Texture * tennisTexture = Texture::GetTennisBallTexture();
+    Textures * tennisTexture = Textures::GetTennisBallTexture();
     tennisTexture->UseTexture();
 
     // Draw Sphere
@@ -155,6 +156,9 @@ void TennisBall::CheckCollisions() {
                 // cout << "currentVelocity before" << aCurrentVelocity.x << " " << aCurrentVelocity.y << " " << aCurrentVelocity.z << endl;
                 aCurrentVelocity = reflect(aCurrentVelocity, planeNormal) + planeVelocity;
                 // cout << "currentVelocity after " << aCurrentVelocity.x << " " << aCurrentVelocity.y << " " << aCurrentVelocity.z << endl;
+
+                //SoundEngine->play2D("../assets/audio/bounce.wav", false);
+                aCollidingPlanes[i]->PlayCollisionSound();
                 aCollidingPlanes[i]->Notify();
             }
         }
