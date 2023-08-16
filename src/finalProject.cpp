@@ -1341,6 +1341,8 @@ int main(int argc, char *argv[])
     GameLogic gameLogic(&frontCourtPlane, &backCourtPlane, &scoreboard, &tennisBall);
     frontCourtPlane.Attach(&gameLogic);
     backCourtPlane.Attach(&gameLogic);
+    
+    gameLogic.SetBallToServingPosition(&backCourtPlane);
 
     // Entering Main Loop
     while (!glfwWindowShouldClose(window))
