@@ -2,6 +2,8 @@
 // 40235157
 // COMP 351 - QUIZ 2
 
+#include "gamelogic.h"
+#include "objects/tennisball.h"
 #define GLEW_STATIC 1
 #include <iostream>
 #include <GL/glew.h>
@@ -15,11 +17,11 @@
 #include <vector>
 #include "glm/gtx/string_cast.hpp"
 #include "scoreboard.hpp"
-
 #include "objects/include.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 #include "modelLoader.h"
+#include "texture.h"
 
 using namespace glm;
 using namespace std;
@@ -79,6 +81,7 @@ vec3 MY_BACKWARD(0.0f, 0.0f, 1.0f);
 mat4 IDENTITY_MATRIX(1.0f);
 
 TennisBall tennisBall;
+Scoreboard scoreBoard = Scoreboard();
 
 GLuint loadTexture(const char *filename)
 {
@@ -790,8 +793,10 @@ void drawScene(int shaderProgram, mat4 elbow[], mat4 wrist[])
 
     //                             ************* RENDER THE FLOOR *************
 
-#pragma region
-    glBindTexture(GL_TEXTURE_2D, tennisID);
+//                             ************* RENDER THE FLOOR *************
+
+    #pragma region
+    Textures::GetTennisCourtTexture()->UseTexture();
     grid_modelMatrix = translate(IDENTITY_MATRIX, vec3(0.0f, -0.3f, 0.0f)) *
                        rotate(IDENTITY_MATRIX, radians(0.0f), vec3(0.0f, 1.0f, 0.0f)) *
                        scale(IDENTITY_MATRIX, vec3(FLOOR_WIDTH, 0.5f, FLOOR_HEIGHT));
@@ -806,7 +811,7 @@ void drawScene(int shaderProgram, mat4 elbow[], mat4 wrist[])
     // Render grass
     colorLocation = glGetUniformLocation(shaderProgram, "myColor");
     glUniform3fv(colorLocation, 1, &colorWhite[0]);
-    glBindTexture(GL_TEXTURE_2D, grassID);
+    Textures::GetGrassTexture()->UseTexture();
     mat4 floor_matrix = translate(mat4(1.0f), vec3(0.0f, -0.5f, 0.0f)) *
                         scale(mat4(1.0f), vec3(200.0f, 0.5f, 200.0f));
     glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "modelMatrix"), 1, GL_FALSE, &floor_matrix[0][0]);
@@ -826,7 +831,7 @@ void drawScene(int shaderProgram, mat4 elbow[], mat4 wrist[])
     glBindTexture(GL_TEXTURE_2D, brickID);
 #pragma endregion
     // ---- Render audience stands ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
-    glBindTexture(GL_TEXTURE_2D, wallID);
+    Textures::GetWallTexture()->UseTexture();
     colorLocation = glGetUniformLocation(shaderProgram, "myColor");
     glUniform3fv(colorLocation, 1, &colorWhite[0]);
 
@@ -906,7 +911,7 @@ void drawScene(int shaderProgram, mat4 elbow[], mat4 wrist[])
         fullModel_rotationMatrix = rotationMatrixArray[i];
 
         //                                     **************** RENDER THE UPPER ARM ****************
-        glBindTexture(GL_TEXTURE_2D, skinID);
+        Textures::GetArmTexture()->UseTexture();
         setMaterial(shaderProgram, vec3(1.0), vec3(1.0), vec3(0.2, 0.2, 0.2), 1.f);
         // group matrix number 1
         mat4 shoulder_groupMatrix = fullModel_translationMatrix * fullModel_rotationMatrix * upperArm_translationMatrix * upperArm_rotationMatrix;
@@ -1023,7 +1028,7 @@ void drawScene(int shaderProgram, mat4 elbow[], mat4 wrist[])
 
         //                                  *** RENDER THE RACKET MESH ***
         // Model matrix components for the racket mesh
-        // The vertical mesh
+        // The horizontal mesh
         for (int i = 0; i < 15; i++)
         {
 
@@ -1043,7 +1048,7 @@ void drawScene(int shaderProgram, mat4 elbow[], mat4 wrist[])
             glUniformMatrix4fv(mesh_modelMatrixLocation, 1, GL_FALSE, &mesh_modelMatrix[0][0]);
             glDrawArrays(currentRenderMode, 0, 36);
         }
-        // The horizontal mesh
+        // The vertical mesh
         for (int j = 0; j < 15; j++)
         {
             mat4 mesh_scaleMatrix = scale(IDENTITY_MATRIX, vec3(0.015f, 0.015f, 3.0f));
@@ -1065,7 +1070,7 @@ void drawScene(int shaderProgram, mat4 elbow[], mat4 wrist[])
 
         // ******************* two centres of the racket planes **********************
         // ***************************************************************************
-        mat4 mesh_scaleMatrix = scale(IDENTITY_MATRIX, vec3(0.015f, 1.7f, 1.3f));
+        mat4 mesh_scaleMatrix = scale(IDENTITY_MATRIX, vec3(0.015f, 3.0f, 2.5f));
         // mat4 mesh_rotationMatrix = rotate(IDENTITY_MATRIX, radians(0.0f), vec3(1.0f, 0.0f, 0.0f));
         mat4 mesh_translationMatrix = translate(IDENTITY_MATRIX, vec3(0.0f, 2.2, 0.0f));
         mat4 aCentre = racketHandle_groupMatrix *
@@ -1082,13 +1087,11 @@ void drawScene(int shaderProgram, mat4 elbow[], mat4 wrist[])
         centers[i] = vec3(aCentre * vec4(0.f, 0.f, 0.f, 1.f));
         // std::cout << glm::to_string(centers[i])<< std::endl;
 
-        if (i == 0)
-        {
-            normals[i] = normalize(vec3(aCentre * vec4(-1.0f, 0.0f, 0.0f, 0.0f)));
-        }
-        else if (i == 1)
-        {
-            normals[i] = normalize(vec3(aCentre * vec4(1.0f, 0.0f, 0.0f, 0.0f)));
+        mat4 aNormals = racketHandle_groupMatrix * mesh_translationMatrix * initialCubeTranslate;
+        if (i == 0){
+            normals[i] = normalize(vec3(aNormals * vec4(-1.0f, 0.0f, 0.0f, 0.0f)));
+        }else if (i == 1){
+            normals[i] = normalize(vec3(aNormals * vec4(1.0f, 0.0f, 0.0f, 0.0f)));
         }
         // std::cout << glm::to_string(normals[i])<< std::endl;
 
@@ -1118,8 +1121,8 @@ void drawScene(int shaderProgram, mat4 elbow[], mat4 wrist[])
     //                      ********************************* SCORE BOARD ***********************************
     // Turn textures off before drawing scoreboard
     setUseTexture(shaderProgram, 0);
-    Scoreboard scoreboard = Scoreboard();
-    scoreboard.drawScoreboard(baseCube_VAO, shaderProgram);
+    
+    scoreBoard.drawScoreboard(baseCube_VAO, shaderProgram);
     setUseTexture(shaderProgram, useTexture);
 }
 
@@ -1305,22 +1308,16 @@ int main(int argc, char *argv[])
     // load textures
     brickID = loadTexture("../assets/textures/brick.jpg");
     skyID = loadTexture("../assets/textures/sky.jpg");
-    cementID = loadTexture("../assets/textures/cement.jpg");
     glossyID = loadTexture("../assets/textures/glossy.jpg");
     woodID = loadTexture("../assets/textures/wood.jpg");
     fabricID = loadTexture("../assets/textures/fabric.jpg");
     metalID = loadTexture("../assets/textures/metal.jpg");
-    tennisID = loadTexture("../assets/textures/court1.jpg");
 
-    ballID = loadTexture("../assets/textures/tennis2.jpg");
-    grassID = loadTexture("../assets/textures/grass.png");
-    wallID = loadTexture("../assets/textures/wall.png");
     ad1ID = loadTexture("../assets/textures/ad1.png");
     ad2ID = loadTexture("../assets/textures/ad2.png");
     ad3ID = loadTexture("../assets/textures/ad3.png");
     ad4ID = loadTexture("../assets/textures/ad4.png");
     borderID = loadTexture("../assets/textures/border.png");
-    skinID = loadTexture("../assets/textures/skin.jpg");
 
     // Model textures
     metalBenchID = loadTexture("../assets/models/bleacher/MetalBench01.png");
@@ -1376,20 +1373,21 @@ int main(int argc, char *argv[])
     vec3 rABCameraPosition = vec3(0.0f, 7, -15.0f);
     vec3 rIBCameraPosition = vec3(0.0f, 7, 15.0f);
 
-    tennisBall = TennisBall(0.5f, vec3(0.f, 8.f, 0.f), vec3(5.0f, 4.f, 0.f), vec3(0.f, -25.f, 0.f), 20.f);
+    tennisBall = TennisBall(0.5f, vec3(0.f, 8.f, 0.f), vec3(-5.0f, 10.f, 0.f), vec3(0.f, -20.f, 0.f), 20.f);
 
     // Plane Constructor: Plane(GLfloat pWidth, GLfloat pHeight, vec3 pNormal, vec3 pUpTiltVector, vec3 pPosition, const char * pPlaneName)
     Plane groundPlane(100, 100, MY_UP, MY_LEFT, vec3(0.f), "Ground");
-    Plane netPlane(100, 3.0, MY_RIGHT, MY_UP, vec3(0.f), "Tennis Net");
-    Plane backCourtPlane(100, 100, MY_LEFT, MY_UP, vec3(FLOOR_WIDTH / 2.0f, 0.f, 0.f), "backCourt");
-    Plane frontCourtPlane(100, 100, MY_RIGHT, MY_UP, vec3(-FLOOR_WIDTH / 2.0f, 0.f, 0.f), "frontCourtPlane");
+    Plane netPlane(100, 3.55, MY_RIGHT, MY_UP, vec3(0.f), "Tennis Net");
+    Plane backCourtPlane(100, 100, MY_LEFT, MY_UP, vec3(FLOOR_WIDTH/2.0f, 0.f, 0.f), "backCourt");
+    Plane frontCourtPlane(100, 100, MY_RIGHT, MY_UP, vec3(-FLOOR_WIDTH/2.0f, 0.f, 0.f), "frontCourtPlane");
     Plane rightCourtPlane(100, 100, MY_FORWARD, MY_UP, vec3(0.f, 0.f, -22.5f), "rightCourtPlane");
     Plane leftCourtPlane(100, 100, MY_BACKWARD, MY_UP, vec3(0.f, 0.f, 22.5f), "leftCourtPlane");
 
     // racket 1 wasd
-    Plane racket1Plane(3.0, 2.5, normals[0], MY_UP, centers[0], "racket1Plane");
+    Plane racket1Plane(2.5, 3.0, normals[0], MY_UP, centers[0], "racket1Plane");
     // racket 2 arrows
-    Plane racket2Plane(3.0, 2.5, normals[1], MY_UP, centers[1], "racket2Plane");
+    Plane racket2Plane(2.5, 3.0, normals[1], MY_UP, centers[1], "racket2Plane");
+
 
     // Bind collision planes to tennis ball
     tennisBall.AddCollidingPlane(&groundPlane);
@@ -1400,6 +1398,16 @@ int main(int argc, char *argv[])
     tennisBall.AddCollidingPlane(&frontCourtPlane);
     tennisBall.AddCollidingPlane(&rightCourtPlane);
     tennisBall.AddCollidingPlane(&leftCourtPlane);
+    
+    GameLogic gameLogic(&frontCourtPlane, &backCourtPlane, &racket1Plane, &racket2Plane, &netPlane, &scoreBoard, &tennisBall);
+
+    frontCourtPlane.Attach(&gameLogic);
+    backCourtPlane.Attach(&gameLogic);
+    racket1Plane.Attach(&gameLogic);
+    racket2Plane.Attach(&gameLogic);
+    netPlane.Attach(&gameLogic);
+    
+    gameLogic.SetBallToServingPosition(&backCourtPlane, &racket2Plane);
 
     // Entering Main Loop
     while (!glfwWindowShouldClose(window))
@@ -1477,6 +1485,13 @@ int main(int argc, char *argv[])
         // render the whole scene (net, grid, axis, two rackets and letters, skybox)
         drawScene(shaderProgram, elbow, wrist);
 
+
+        // Turn textures off before drawing scoreboard
+        setUseTexture(shaderProgram, 0);
+        scoreBoard.drawScoreboard(baseCube_VAO, shaderProgram);
+        
+        setUseTexture(shaderProgram, useTexture);
+
         // End frame
         glfwSwapBuffers(window);
 
@@ -1532,45 +1547,59 @@ int main(int argc, char *argv[])
         // first racket movement (WASD)
         if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
         {
+            if(centers[0].z <=20){
             translateModelVector = MY_BACKWARD * (WASD_speed * dt);
             translationMatrixArray[0] = translationMatrixArray[0] * translate(IDENTITY_MATRIX, translateModelVector);
+            }
+            
         }
         if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         {
+            if(centers[0].z >=- 22){
             translateModelVector = MY_FORWARD * (WASD_speed * dt);
             translationMatrixArray[0] = translationMatrixArray[0] * translate(IDENTITY_MATRIX, translateModelVector);
+            }
         }
         if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
         {
+            if(centers[0].x <= -1){
             translateModelVector = MY_RIGHT * (WASD_speed * dt);
             translationMatrixArray[0] = translationMatrixArray[0] * translate(IDENTITY_MATRIX, translateModelVector);
+            }
         }
         if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
         {
+            if(centers[0].x >= -38){
             translateModelVector = MY_LEFT * (WASD_speed * dt);
-            translationMatrixArray[0] = translationMatrixArray[0] * translate(IDENTITY_MATRIX, translateModelVector);
+            translationMatrixArray[0] = translationMatrixArray[0] * translate(IDENTITY_MATRIX, translateModelVector);}
         }
 
         // second racket movement (ARROWS)
         if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
         {
+            if(centers[1].z <=20){
             translateModelVector = MY_BACKWARD * (ARROWS_speed * dt);
-            translationMatrixArray[1] = translationMatrixArray[1] * translate(IDENTITY_MATRIX, translateModelVector);
+            translationMatrixArray[1] = translationMatrixArray[1] * translate(IDENTITY_MATRIX, translateModelVector);}
         }
         if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
         {
+            if(centers[1].z >= -22){
             translateModelVector = MY_FORWARD * (ARROWS_speed * dt);
-            translationMatrixArray[1] = translationMatrixArray[1] * translate(IDENTITY_MATRIX, translateModelVector);
+            translationMatrixArray[1] = translationMatrixArray[1] * translate(IDENTITY_MATRIX, translateModelVector);}
         }
         if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
         {
+            if(centers[1].x <= 39){
             translateModelVector = MY_RIGHT * (ARROWS_speed * dt);
             translationMatrixArray[1] = translationMatrixArray[1] * translate(IDENTITY_MATRIX, translateModelVector);
+            }
         }
         if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
         {
+            if(centers[1].x >= 1){
             translateModelVector = MY_LEFT * (ARROWS_speed * dt);
             translationMatrixArray[1] = translationMatrixArray[1] * translate(IDENTITY_MATRIX, translateModelVector);
+            }
         }
         if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS && lastTstate == GLFW_RELEASE)
         {
@@ -1684,6 +1713,7 @@ int main(int argc, char *argv[])
         {
             cameraPosition = vec3(40.0f, 20.0f, 0.0f);
         }
+
 
         // update the space bar status.
         lastSpaceBarState = glfwGetKey(window, GLFW_KEY_SPACE);

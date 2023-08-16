@@ -3,7 +3,7 @@
 class Scoreboard
 {
 public:
-    const int MAXSCORE = 40;
+    static const int MAXSCORE = 40;
     int player1Score = 0, player2Score = 0;
     int minutes = 0, seconds = 0;
     glm::vec3 player1Color = glm::vec3(0.0f, 0.0f, 1.0f);
@@ -40,25 +40,25 @@ public:
             player2Score = 0;
         }
 
-        // Draw player 1 score
+        // Draw player 2 score
         // Ones
         glUniform3fv(glGetUniformLocation(shaderProgram, "myColor"), 1, &player1Color[0]); // set color
         glm::mat4 transform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 2.5f));
-        drawNumber(shaderProgram, player1Score % 10, modelMatrix * transform);
+        drawNumber(shaderProgram, player2Score  % 10, modelMatrix * transform);
 
         // Tens
         transform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 6.0f));
-        drawNumber(shaderProgram, player1Score / 10, modelMatrix * transform);
+        drawNumber(shaderProgram,  player2Score / 10, modelMatrix * transform);
 
         // Draw player 2 score
         // Ones
         glUniform3fv(glGetUniformLocation(shaderProgram, "myColor"), 1, &player2Color[0]); // set color
         transform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -6.0f));
-        drawNumber(shaderProgram, player2Score % 10, modelMatrix * transform);
+        drawNumber(shaderProgram, player1Score % 10, modelMatrix * transform);
 
         // Tens
         transform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -2.5f));
-        drawNumber(shaderProgram, player2Score / 10, modelMatrix * transform);
+        drawNumber(shaderProgram, player1Score / 10, modelMatrix * transform);
 
         // render time above scoreboard
         glUniform3fv(glGetUniformLocation(shaderProgram, "myColor"), 1, &timeColor[0]); // set color

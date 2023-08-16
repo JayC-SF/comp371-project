@@ -64,61 +64,75 @@ Textures::~Textures()
     ClearTexture();
 }
 
-Textures *Textures::GetClayTexture()
+Textures * Textures::GetClayTexture()
 {
     static Textures instance("../assets/textures/clay-tennis-court.png");
     return &instance;
 }
-Textures *Textures::GetGlossyTexture()
+Textures * Textures::GetGlossyTexture()
 {
     static Textures instance("../assets/textures/glossy.jpg");
     return &instance;
 }
 
-Textures *Textures::GetTennisBallTexture()
+Textures * Textures::GetTennisBallTexture()
 {
     static Textures instance("../assets/textures/tennis-ball.jpeg");
     return &instance;
 }
 
-Textures *Textures::GetArmTexture()
-{
-    static Textures instance("../assets/textures/arm.jpeg");
+Textures * Textures::GetArmTexture() {
+    static Textures instance("../assets/textures/skin.jpg");
     return &instance;
 }
 
-Textures *Textures::GetSilverMetalTexture()
+Textures * Textures::GetSilverMetalTexture()
 {
     static Textures instance("../assets/textures/silver-metal.jpeg");
     return &instance;
 }
 
-Textures *Textures::GetTennisStrapTexture()
+Textures * Textures::GetTennisStrapTexture()
 {
     static Textures instance("../assets/textures/tennis-strap.jpg");
     return &instance;
 }
 
-Textures *Textures::GetWoodTexture()
+Textures * Textures::GetWoodTexture()
 {
     static Textures instance("../assets/textures/wood.jpeg");
     return &instance;
 }
 
-Textures *Textures::GetCementTexture()
+Textures * Textures::GetCementTexture()
 {
     static Textures instance("../assets/textures/cement.jpeg");
     return &instance;
 }
 
-Textures *Textures::GetTattooTexture()
+Textures * Textures::GetTattooTexture()
 {
     static Textures instance("../assets/textures/tattoo.jpeg");
     return &instance;
 }
 
-Textures *Textures::GetSkyTexture()
+Textures * Textures::GetSkyTexture()
 {
     static Textures instance("../assets/textures/sky.jpeg");
+    return &instance;
+}
+
+Textures * Textures::GetGrassTexture() {
+    static Textures instance("../assets/textures/grass.png");
+    return &instance;
+}
+
+Textures * Textures::GetWallTexture() {
+    static Textures instance("../assets/textures/wall.png");
+    return &instance;
+}
+
+Textures * Textures::GetTennisCourtTexture() {
+    static Textures instance("../assets/textures/court1.jpg");
     return &instance;
 }
