@@ -4,15 +4,5 @@ build/
 .vs/
 dist/
 .DS_Store
-thirdparty/assimp-build
-thirdparty/assimp-src
-thirdparty/assimp-subbuild
-thirdparty/thirdparty-glew-build
-thirdparty/thirdparty-glew-src
-thirdparty/thirdparty-glew-subbuild
-thirdparty/thirdparty-glfw-build
-thirdparty/thirdparty-glfw-src
-thirdparty/thirdparty-glfw-subbuild
-thirdparty/thirdparty-glm-build
-thirdparty/thirdparty-glm-src
-thirdparty/thirdparty-glm-subbuild
+thirdparty/assimp*
+thirdparty/thirdparty*
