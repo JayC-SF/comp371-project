@@ -74,6 +74,13 @@ void TennisBall::Update() {
     aModelMatrix = translate(mat4(1.f), aCurrentPosition) * aRotation * aScale;
     aIsUpdated = true;
 }
+GLfloat TennisBall::GetRadius() {
+    return aRadius;
+}
+void printVector(vec3 v) {
+    cout << "(" << v.x << ", " << v.y << ", " << v.z << ")" << endl;
+
+}
 
 void TennisBall::UpdatePhysics(GLfloat dt) {
     // calculate position
@@ -101,10 +108,6 @@ void TennisBall::AddCollidingPlane(Plane * pPlane) {
     aCollidingPlanes.push_back(pPlane);
     aCollidingStates.push_back(false);
 }
-void printVector(vec3 v) {
-    cout << "(" << v.x << ", " << v.y << ", " << v.z << ")" << endl;
-
-}
 
 void TennisBall::CheckCollisions() {
     for (int i = 0; i<aCollidingPlanes.size(); i++) {
@@ -115,7 +118,7 @@ void TennisBall::CheckCollisions() {
         // since normal is already a unit vector, no need to divide by magnitude
         GLfloat projMag = dot(planeToSphereCenter, planeNormal);
         
-        bool currentCollidingState = abs(projMag) < aRadius;
+        bool currentCollidingState = abs(projMag) < aRadius + 0.5;
         // check if projection magnitude is less than the radius length
         // if so check if point is inside the plane.
         if (currentCollidingState) {
@@ -152,8 +155,7 @@ void TennisBall::CheckCollisions() {
                 // cout << "currentVelocity before" << aCurrentVelocity.x << " " << aCurrentVelocity.y << " " << aCurrentVelocity.z << endl;
                 aCurrentVelocity = reflect(aCurrentVelocity, planeNormal) + planeVelocity;
                 // cout << "currentVelocity after " << aCurrentVelocity.x << " " << aCurrentVelocity.y << " " << aCurrentVelocity.z << endl;
-
-                // aCollidingPlanes[i]->Notify();
+                aCollidingPlanes[i]->Notify();
             }
         }
         aCollidingStates[i] = currentCollidingState;
@@ -168,4 +170,14 @@ void TennisBall::SetPosition(vec3 pPosition) {
 }
 void TennisBall::SetAcceleration(vec3 pAcceleration) {
     aCurrentAcceleration = pAcceleration;
+}
+
+vec3 TennisBall::GetPosition() {
+    return aCurrentPosition;
+}
+vec3 TennisBall::GetVelocity() {
+    return aCurrentVelocity;
+}
+vec3 TennisBall::GetAcceleration() {
+    return aCurrentAcceleration;
 }
