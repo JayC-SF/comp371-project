@@ -11,10 +11,12 @@ A short and sweet demonstration of a two-person tennis game simulator that plays
 Racket 1 (racket closer to camera):
 - Arrow Keys to move
 - L to perform swing
+- Right Shift to sprint
 
 Racket 2 (racket on other side):
 - WASD to move
 - E to perform swing
+- Left Shift to sprint
 
 ## Build Instructions
 
@@ -81,22 +83,24 @@ The following steps are the instructions to set up the final project with irrKla
 
    ![Solution 2.2](README/solution2.2.png)
 
-10. Inside irrKlang's folder, go to `lib > Winx64-visualStudio`. Copy `irrKlang.exp` & `irrKlang.lib` and paste these files into `comp371-project > build > lib`
-
-    ![Solution 2.3](README/solution2.3.png)
-
-11. In Visual Studio, head back to `fProject > Properties > Linker > Input`. Click on `Additional Dependancies > Edit`.
-12. Add the following lines: `lib/irrKlang.lib` & `lib/irrKlang.exp`. Click Ok.
-
-    ![Solution 2.4](README/solution2.4.png)
-
-13. Inside the repository, find a `dll/` folder. Copy `ikpMP3.dll`, `irrKlang.dll` & `ikpFlac.dll` into `build/`. All dependancies should set up properly now.
+10. Inside the repository, find a `dll/` folder. Copy `ikpMP3.dll`, `irrKlang.dll` & `ikpFlac.dll` into `build/`.
 
     ![Solution 2.5](README/solution2.5.png)
 
+11. Inside irrKlang's folder, go to `lib > Winx64-visualStudio`. Copy `irrKlang.exp` & `irrKlang.lib` and paste these files into `comp371-project > build > lib`
+
+    ![Solution 2.3](README/solution2.3.png)
+
+12. In Visual Studio, head back to `fProject > Properties > Linker > Input`. Click on `Additional Dependancies > Edit`.
+13. Add the following lines: `lib/irrKlang.lib` & `lib/irrKlang.exp`. Click Apply and Ok. All dependancies should be set up now
+
+    ![Solution 2.4](README/solution2.4.png)
+
+
 14. In Visual Studio, run `Build > Rebuild Solution` & `Build > Rebuild fProject`. This could take a while. Ignore any errors once finished building.
 15. Run the project by pressing the play button. The project should load and you should be able to play. Enjoy!
-    
+
+If the same error still pops up, make sure to verify all dependancies were added and make sure to press Apply and Ok. If there are any new errors unfamiliar to this guide, please feel free to contact [Daniel](https://github.com/LamDaniel1) to help resolve your issue.
 
 ## Collaborators
 
