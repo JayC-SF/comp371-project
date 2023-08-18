@@ -1,6 +1,5 @@
-// MASSIMO MANGIOLA
-// 40235157
-// COMP 351 - QUIZ 2
+// COMP 371 - Tennis Final Project
+// Team 2
 
 #include "gamelogic.h"
 #include "objects/tennisball.h"
