@@ -1,4 +1,10 @@
-# comp371-project
+# COMP 371 - Tennis Final Project
+
+## Description
+
+A short and sweet demonstration of a two-person tennis game simulator that plays like a pong game. This 2-player game lets you control individual rackets, allowing players to skillfully maneuver and return the ball to each other. The integration of irrKlang and Assimp frameworks enhances the experience with realistic audio and 3D models. Enjoy a casual and engaging virtual tennis match with friends, where precise racket movements lead to exciting gameplay moments. Built using OpenGL and C++.
+
+![](comp371-projectgif.gif)
 
 ## Build Instructions
 
@@ -62,6 +68,10 @@ In the terminal type:
 ### Windows
 
 Click on the **lab02.exe** from the File Explorer.
+
+## Collaborators
+
+- 
 
 ## References
 
