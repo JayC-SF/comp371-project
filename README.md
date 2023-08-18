@@ -2,7 +2,7 @@
 
 ## Description
 
-A short and sweet demonstration of a two-person tennis game simulator that plays like a pong game. This game lets you control individual rackets, allowing players to skillfully maneuver and return the ball to each other. The integration of irrKlang and Assimp frameworks enhances the experience with realistic audio and 3D models. Enjoy a casual and engaging virtual tennis match with friends, where precise racket movements lead to exciting gameplay moments. Built using OpenGL and C++.
+A short and sweet demonstration of a two-person tennis game simulator that plays like a pong game. This game lets you control individual rackets, allowing players to skillfully maneuver and return the ball to each other. Score on your opoonent with your masterfull skills and watch the points on the scoreboard rise! The integration of irrKlang and Assimp frameworks enhances the experience with realistic audio and 3D models. Enjoy a casual and engaging virtual tennis match with friends, where precise racket movements lead to exciting gameplay moments. Built using OpenGL and C++.
 
 ![GIF of our project](README/comp371-projectgif.gif)
 
@@ -65,7 +65,7 @@ The following steps are the instructions to set up the final project with irrKla
 
    ![Error 1](README/error1.png)
 
-5. To fix this, look in your Solution Explorer on your right. Right-click `Solution 'fProject' > Properties`
+5. To fix this, look in your Solution Explorer on your right. Right-click `Solution 'fProject' (9 of 9 projects) > Properties`
 6. Select `Single Startup Project` and switch from `ALL_BUILD` to `fProject`. Select Apply and Ok
 
    ![Solution1](README/solution1.png)
