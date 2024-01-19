@@ -6,7 +6,7 @@ A short and sweet demonstration of a two-person tennis game simulator that plays
 ### Please allow a couple of seconds for the image below to load...
 ![GIF of our project](README/comp371-projectgif.gif)
 
-To see the full video [click here](README/comp371-projectgif.gif).
+To see the full video [click here](README/comp371-projectdemo.mp4).
 ## Controls
 
 Racket 1 (racket closer to camera):
